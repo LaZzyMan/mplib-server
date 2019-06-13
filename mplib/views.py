@@ -22,6 +22,9 @@ def check_session(session):
         user.session = new_session
         user.sessionDate = timezone.now()
         user.save()
+        return new_session
+    else:
+        return session
 
 
 class SessionFilter(filters.BaseFilterBackend):
@@ -41,15 +44,15 @@ class LibUserViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False)
     def login(self, request):
         user = models.User.objects.get(session=request.query_params.get('session', ''))
-        check_session(user.session)
+        session = check_session(user.session)
         auth = self.xi.bor_auth_valid(uid=request.query_params.get('libId', ''),
                                       verification=request.query_params.get('libPsw', ''))
         if len(auth['result']) == 1:
-            return Response({'status': 1, 'session': user.session})
+            return Response({'status': 1, 'session': session})
         else:
             try:
                 lu = models.LibUser.objects.get(libId=request.query_params.get('libId', ''))
-                return Response({'status': 0, 'user': lu, 'session': user.session})
+                return Response({'status': 0, 'user': lu, 'session': session})
             except:
                 result_json = {}
                 result = self.xi.x_bor_info(bor_id=request.query_params.get('libId', ''))
@@ -64,13 +67,13 @@ class LibUserViewSet(viewsets.ModelViewSet):
                                     registrationDate=datetime.strptime(result_json['z305_registration_date'], '%Y%m%d'),
                                     expiryDate=datetime.strptime(result_json['z305_expiry_date'], '%Y%m%d'))
                 lu.save()
-                return Response({'status': 0, 'user': lu, 'session': user.session})
+                return Response({'status': 0, 'user': lu, 'session': session})
 
     @action(methods=['get'], detail=False)
     def borrow_info(self, request):
         session = request.query_params.get('session', '')
         user = models.User.objects.get(session=session)
-        check_session(session)
+        session = check_session(session)
         result = self.xi.bor_info(uid=user.libAccount.libId)
         return Response({'status': 0, 'result': result['loan'], 'session': session})
 
@@ -78,7 +81,7 @@ class LibUserViewSet(viewsets.ModelViewSet):
     def loan_history(self, request):
         session = request.query_params.get('session', '')
         user = models.User.objects.get(session=session)
-        check_session(session)
+        session = check_session(session)
         result = self.xi.loan_history_detail(bor_id=user.libAccount.libId)
         return Response({'status': 0, 'result': result, 'session': session})
 
@@ -86,7 +89,7 @@ class LibUserViewSet(viewsets.ModelViewSet):
     def hold_info(self, request):
         session = request.query_params.get('session', '')
         user = models.User.objects.get(session=session)
-        check_session(session)
+        session = check_session(session)
         result = self.xi.bor_info(uid=user.libAccount.libId)
         return Response({'status': 0, 'result': result['hold'], 'session': session})
 
@@ -95,9 +98,9 @@ class LibUserViewSet(viewsets.ModelViewSet):
         session = request.query_params.get('session', '')
         keyword = request.query_params.get('keyword', '')
         user = models.User.objects.get(session=session)
-        check_session(session)
+        session = check_session(session)
         result = self.xi.find(request=keyword)
-        return Response({'status': 0, 'session': user.session, 'result': result})
+        return Response({'status': 0, 'session': session, 'result': result})
 
     @action(methods=['get'], detail=False)
     def present(self, request):
@@ -105,9 +108,9 @@ class LibUserViewSet(viewsets.ModelViewSet):
         set_num = request.query_params.get('set_num', '')
         entry = request.query_params.get('entry', 1)
         user = models.User.objects.get(session=session)
-        check_session(session)
+        session = check_session(session)
         present_info = self.xi.present(set_number=set_num, set_entry=entry)
-        return Response({'status': 0, 'result': present_info, 'session': user.session})
+        return Response({'status': 0, 'result': present_info, 'session': session})
 
     @action(methods=['get'], detail=False)
     def book_detail(self, request):
@@ -115,20 +118,20 @@ class LibUserViewSet(viewsets.ModelViewSet):
         doc_num = request.query_params.get('doc_num', '')
         detail = self.xi.circ_status(sys_no=doc_num)
         user = models.User.objects.get(session=session)
-        check_session(session)
-        return Response({'status': 0, 'result': detail, 'session': user.session})
+        session = check_session(session)
+        return Response({'status': 0, 'result': detail, 'session': session})
 
     @action(methods=['get'], detail=False)
     def renew(self, request):
         session = request.query_params.get('session', '')
         bar_code = request.query_params.get('bar_code', '')
         user = models.User.objects.get(session=session)
-        check_session(session)
+        session = check_session(session)
         result = self.xi.renew(bar_code=bar_code, bor_id=user.libAccount.libId)
         if result['result'] == 0:
-            return Response({'status': 0, 'session': user.session})
+            return Response({'status': 0, 'session': session})
         else:
-            return Response({'status': 1, 'session': user.session})
+            return Response({'status': 1, 'session': session})
 
     @action(methods=['get'], detail=False)
     def hold_req(self, request):
@@ -136,12 +139,12 @@ class LibUserViewSet(viewsets.ModelViewSet):
         bar_code = request.query_params.get('bar_code', '')
         pickup_loc = request.query_params.get('pickup', '')
         user = models.User.objects.get(session=session)
-        check_session(session)
+        session = check_session(session)
         result = self.xi.hold_req_nlc(bar_code=bar_code, bor_id=user.libAccount.libBorId, pickup_loc=pickup_loc)
         if result['result'] == 0:
-            return Response({'status': 0, 'session': user.session})
+            return Response({'status': 0, 'session': session})
         else:
-            return Response({'status': 1, 'session': user.session})
+            return Response({'status': 1, 'session': session})
 
     @action(methods=['get'], detail=False)
     def hold_req_cancel(self, request):
@@ -150,12 +153,12 @@ class LibUserViewSet(viewsets.ModelViewSet):
         item_sequence = request.query_params.get('item_sequence', '')
         sequence = request.query_params.get('sequence', '')
         user = models.User.objects.get(session=session)
-        check_session(session)
+        session = check_session(session)
         result = self.xi.hold_req_cancel(doc_number=doc_number, item_sequence=item_sequence, sequence=sequence, bor_id=user.libAccount.libBorId)
         if result['result'] == 0:
-            return Response({'status': 0, 'session': user.session})
+            return Response({'status': 0, 'session': session})
         else:
-            return Response({'status': 1, 'session': user.session})
+            return Response({'status': 1, 'session': session})
 
     @action(methods=['get'], detail=False)
     def rank(self, request):
@@ -210,11 +213,11 @@ class UserViewSet(viewsets.ModelViewSet):
     def vertify_session(self, request):
         try:
             user = models.User.objects.get(session=request.query_params.get('session', ''))
-            check_session(user.session)
+            session = check_session(user.session)
             if user.libAccount is None:
-                return Response({'login': True, 'libBind': False, 'session': user.session})
+                return Response({'login': True, 'libBind': False, 'session': session})
             else:
-                return Response({'login': True, 'libBind': True, 'session': user.session})
+                return Response({'login': True, 'libBind': True, 'session': session})
         except:
             return Response({'login': False, 'libBind': False})
 
@@ -232,13 +235,13 @@ class UserViewSet(viewsets.ModelViewSet):
         response = requests.request("GET", url, data='', headers=headers, params=querystring)
         result = response.json()
         user = models.User.objects.get(session=request.query_params.get('session', ''))
-        check_session(user.session)
+        session = check_session(user.session)
         if result['errorcode'] == 0:
             user.wxSessionKey = result['session_key']
             user.save()
-            return Response({'status': 0, 'session': user.session})
+            return Response({'status': 0, 'session': session})
         else:
-            return Response({'status': 1, 'session': user.session})
+            return Response({'status': 1, 'session': session})
 
     @action(methods=['get'], detail=False)
     def login(self, request):
@@ -287,20 +290,20 @@ class UserViewSet(viewsets.ModelViewSet):
     def bind_lib(self, request):
         try:
             user = models.User.objects.get(session=request.query_params.get('session', ''))
-            check_session(user.session)
+            session = check_session(user.session)
             libuser = models.LibUser.objects.get(libId=request.query_params.get('libId', ''))
             user.libAccount = libuser
             user.save()
-            return Response({'status': 0, 'session': user.session})
+            return Response({'status': 0, 'session': session})
         except:
             return Response({'status': 1})
 
     @action(methods=['get'], detail=False)
     def unbind_lib(self, request):
         user = models.User.objects.get(session=request.query_params.get('session', ''))
-        check_session(user.session)
+        session = check_session(user.session)
         user.libAccount = None
-        return Response({'status': 0, 'session': user.session})
+        return Response({'status': 0, 'session': session})
 
 
 schema_view = get_swagger_view(title='Lib Mini Program API', url=None)
