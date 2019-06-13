@@ -47,7 +47,7 @@ class LibUserViewSet(viewsets.ModelViewSet):
         session = check_session(user.session)
         auth = self.xi.bor_auth_valid(uid=request.query_params.get('libId', ''),
                                       verification=request.query_params.get('libPsw', ''))
-        if len(auth['result']) == 1:
+        if auth['result'] == 1:
             return Response({'status': 1, 'session': session})
         else:
             try:
