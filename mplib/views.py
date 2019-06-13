@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
 from rest_framework_swagger.views import get_swagger_view
 from datetime import datetime
+from django.utils import timezone
 import json
 import requests
 import uuid
@@ -16,10 +17,10 @@ from mplib import serializers, models
 
 def check_session(session):
     user = models.User.objects.get(session=session)
-    if (datetime.now() - user.sessionDate).total_seconds() > 120:
+    if (timezone.now() - user.sessionDate).total_seconds() > 120:
         new_session = uuid.uuid1()
         user.session = new_session
-        user.sessionDate = datetime.now()
+        user.sessionDate = timezone.now()
         user.save()
 
 
