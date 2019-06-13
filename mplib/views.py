@@ -52,7 +52,7 @@ class LibUserViewSet(viewsets.ModelViewSet):
         else:
             try:
                 lu = models.LibUser.objects.get(libId=request.query_params.get('libId', ''))
-                return Response({'status': 0, 'user': lu, 'session': session})
+                return Response({'status': 0, 'user': {'name': lu.name, 'bor_id': lu.libId, 'department': lu.department, 'reader_type': lu.readerType}, 'session': session})
             except:
                 result_json = {}
                 result = self.xi.x_bor_info(bor_id=request.query_params.get('libId', ''))
@@ -67,7 +67,7 @@ class LibUserViewSet(viewsets.ModelViewSet):
                                     registrationDate=datetime.strptime(result_json['z305_registration_date'], '%Y%m%d'),
                                     expiryDate=datetime.strptime(result_json['z305_expiry_date'], '%Y%m%d'))
                 lu.save()
-                return Response({'status': 0, 'user': lu, 'session': session})
+                return Response({'status': 0, 'user': {'name': lu.name, 'bor_id': lu.libId, 'department': lu.department, 'reader_type': lu.readerType}, 'session': session})
 
     @action(methods=['get'], detail=False)
     def borrow_info(self, request):
