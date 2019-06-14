@@ -303,6 +303,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user = models.User.objects.get(session=request.query_params.get('session', ''))
         session = check_session(user.session)
         user.libAccount = None
+        user.save()
         return Response({'status': 0, 'session': session})
 
 
