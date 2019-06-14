@@ -210,7 +210,7 @@ class XInterface(object):
             book['sub_library'] = item.find('sub-library').text
             book['bar_code'] = item.find('barcode').text
             book['location'] = item.find('location').text
-            book['rfid'] = 'http://opac.lib.whu.edu.cn/rfid-pos/graph.aspx?bookid=' + book['bar_code']
+            book['rfid'] = 'https://opac.lib.whu.edu.cn/rfid-pos/graph.aspx?bookid=' + book['bar_code']
             books.append(book)
         return books
 
@@ -376,6 +376,9 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
+    xi.circ_status(sys_no='001165085')
+    set_info = xi.find(request='东野圭吾', code='wau')
+    present_info = xi.present(set_number=set_info['set_number'], set_entry=1)
     auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
     xi.x_bor_info(bor_id='2016302590080')
     xi.loan_history_detail(bor_id='2016302590080')
@@ -384,6 +387,5 @@ if __name__ == '__main__':
     xi.hold_req_nlc(bor_id=auth['bor_id'], bar_code='101102121871', pickup_loc='XX')
     set_info = xi.find(request='高等数学')
     present_info = xi.present(set_number=set_info['set_number'], set_entry=1)
-    xi.circ_status(sys_no=present_info[0]['doc_number'])
     xi.bor_auth(uid='2015302590005', verification='180856')
 
