@@ -109,7 +109,7 @@ class LibUserViewSet(viewsets.ModelViewSet):
         entry = request.query_params.get('entry', 1)
         user = models.User.objects.get(session=session)
         session = check_session(session)
-        present_info = self.xi.present(set_number=set_num, set_entry=entry)
+        present_info = self.xi.present(set_number=set_num, set_entry=int(entry))
         return Response({'status': 0, 'result': present_info, 'session': session})
 
     @action(methods=['get'], detail=False)

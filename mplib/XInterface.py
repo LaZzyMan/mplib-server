@@ -376,11 +376,11 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
+    auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
     xi.x_bor_info(bor_id='2016302590080')
     xi.loan_history_detail(bor_id='2016302590080')
     xi.bor_info(uid='2016302590080')
     xi.renew(bor_id='2016302590080', bar_code='101100356208')
-    auth = xi.bor_auth_valid(uid='2015302590005', verification='180856')
     xi.hold_req_nlc(bor_id=auth['bor_id'], bar_code='101102121871', pickup_loc='XX')
     set_info = xi.find(request='高等数学')
     present_info = xi.present(set_number=set_info['set_number'], set_entry=1)
