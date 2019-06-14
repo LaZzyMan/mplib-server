@@ -97,9 +97,10 @@ class LibUserViewSet(viewsets.ModelViewSet):
     def find(self, request):
         session = request.query_params.get('session', '')
         keyword = request.query_params.get('keyword', '')
+        code = request.query_params.get('code', '')
         user = models.User.objects.get(session=session)
         session = check_session(session)
-        result = self.xi.find(request=keyword)
+        result = self.xi.find(request=keyword, code=code)
         return Response({'status': 0, 'session': session, 'result': result})
 
     @action(methods=['get'], detail=False)

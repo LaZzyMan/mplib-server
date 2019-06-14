@@ -104,6 +104,7 @@ libuser/find
 
 - session
 - keyword
+- code(wrd, wti, WAU, CAN, ISS, ISB)
 
 #### 返回
 
@@ -204,7 +205,7 @@ libuser/hold_req
 
 - session
 - bar_code
-- pickup
+- pickup(WL, XX, GX, YX)
 
 #### 返回
 

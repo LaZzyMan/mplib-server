@@ -115,7 +115,7 @@ class XInterface(object):
             'hold': hold_list
         }
 
-    def find(self, request=''):
+    def find(self, request='', code='wrd'):
         '''
         默认关键词检索
         :param request:
@@ -126,7 +126,7 @@ class XInterface(object):
             "request": request,
             "base": self.lib,
             "session": self.session,
-            "code": "wrd"
+            "code": code
         }
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
