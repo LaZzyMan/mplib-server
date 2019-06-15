@@ -156,7 +156,8 @@ class XInterface(object):
         params = {
             "op": "present",
             "set_number": set_number,
-            "set_entry": '%d-%d' % (set_entry, set_entry + self.page_size - 1),
+            # "set_entry": '%d-%d' % (set_entry, set_entry + self.page_size - 1),
+            "set_entry": '121-130',
             "base": lib,
             # "session": self.session
         }
@@ -408,15 +409,16 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
-    set_info = xi.find(request='math', code='wrd', lang='en')
-    present_info = xi.present(set_number=set_info['set_number'], set_entry=1, lang='en')
-    xi.circ_status(sys_no=present_info[0]['doc_number'], lang='en')
+    xi.hold_req_nlc(bor_id='ID900122044', bar_code='101102121872', pickup_loc='XX')
+    xi.bor_info(uid='2015302590078')
+    xi.loan_history_detail(bor_id='2015302590030')
+    xi.x_bor_info(bor_id='2015302590078')
+    set_info = xi.find(request='东野圭吾', code='wau')
+    present_info = xi.present(set_number=set_info['set_number'], set_entry=1)
+    xi.circ_status(sys_no=present_info[0]['doc_number'])
     auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
-    xi.x_bor_info(bor_id='2016302590080')
-    xi.loan_history_detail(bor_id='2016302590080')
-    xi.bor_info(uid='2016302590080')
     xi.renew(bor_id='2016302590080', bar_code='101100356208')
     set_info = xi.find(request='高等数学')
     xi.bor_auth(uid='2015302590005', verification='180856')
-    xi.hold_req_nlc(bor_id='ID900122044', bar_code='101102284999', pickup_loc='WL')
+
 

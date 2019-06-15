@@ -99,10 +99,11 @@ class LibUserViewSet(viewsets.ModelViewSet):
     def find(self, request):
         session = request.query_params.get('session', '')
         keyword = request.query_params.get('keyword', '')
+        lang = request.query_params.get('lang', 'cn')
         code = request.query_params.get('code', '')
         user = models.User.objects.get(session=session)
         session = check_session(session)
-        result = self.xi.find(request=keyword, code=code)
+        result = self.xi.find(request=keyword, code=code, lang=lang)
         return Response({'status': 0, 'session': session, 'result': result})
 
     @action(methods=['get'], detail=False)
@@ -110,9 +111,10 @@ class LibUserViewSet(viewsets.ModelViewSet):
         session = request.query_params.get('session', '')
         set_num = request.query_params.get('set_num', '')
         entry = request.query_params.get('entry', 1)
+        lang = request.query_params.get('lang', 'cn')
         user = models.User.objects.get(session=session)
         session = check_session(session)
-        present_info = self.xi.present(set_number=set_num, set_entry=int(entry))
+        present_info = self.xi.present(set_number=set_num, set_entry=int(entry), lang=lang)
         return Response({'status': 0, 'result': present_info, 'session': session})
 
     @action(methods=['get'], detail=False)
