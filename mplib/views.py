@@ -204,6 +204,15 @@ class LibUserViewSet(viewsets.ModelViewSet):
             search = search[:30]
         return Response(search)
 
+    @action(methods=['get'], detail=False)
+    def watch(self, request):
+        return Response(self.xi.session)
+
+    @action(methods=['get'], detail=False)
+    def fix(self, request):
+        self.xi.session = self.xi.login()
+        return Response(self.xi.session)
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = models.User.objects.all()

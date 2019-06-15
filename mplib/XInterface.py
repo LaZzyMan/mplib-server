@@ -125,12 +125,11 @@ class XInterface(object):
             "op": "find",
             "request": request,
             "base": self.lib,
-            "session": self.session,
+            # "session": self.session,
             "code": code
         }
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
-        self.session = et.find('session-id').text
         try:
             err_message = et.find('error').text
             print(err_message)
@@ -152,11 +151,10 @@ class XInterface(object):
             "set_number": set_number,
             "set_entry": '%d-%d' % (set_entry, set_entry + self.page_size - 1),
             "base": self.lib,
-            "session": self.session
+            # "session": self.session
         }
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
-        self.session = et.find('session-id').text
         records = et.findall('record')
         books = []
         for record in records:
@@ -195,11 +193,10 @@ class XInterface(object):
             "op": "circ-status",
             "sys_no": sys_no,
             "library": self.lib,
-            "session": self.session
+            # "session": self.session
         }
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
-        self.session = et.find('session-id').text
         items = et.findall('item-data')
         books = []
         for item in items:
@@ -386,6 +383,5 @@ if __name__ == '__main__':
     xi.renew(bor_id='2016302590080', bar_code='101100356208')
     xi.hold_req_nlc(bor_id=auth['bor_id'], bar_code='101102121871', pickup_loc='XX')
     set_info = xi.find(request='高等数学')
-    present_info = xi.present(set_number=set_info['set_number'], set_entry=1)
     xi.bor_auth(uid='2015302590005', verification='180856')
 
