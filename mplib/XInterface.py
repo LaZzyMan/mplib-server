@@ -239,7 +239,7 @@ class XInterface(object):
                 return {'result': 1}
         except AttributeError as _:
             print(response.content.decode('utf-8'))
-            return {'result': 0}
+            return {'result': 1}
 
     def hold_req_nlc(self, bar_code, bor_id, pickup_loc):
         '''
