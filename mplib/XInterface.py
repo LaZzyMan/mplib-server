@@ -23,7 +23,9 @@ class XInterface(object):
         self.un = username
         self.pw = password
         self.headers = HEADERS
-        self.lib = 'whu01'
+        self.cn_lib = 'whu01'
+        self.en_lib = 'whu09'
+        self.au_lib = 'whu50'
         self.session = self.login()
         self.page_size = PAGE_SIZE
         self.alpha_psw = alpha_psw
@@ -37,7 +39,7 @@ class XInterface(object):
             "op": "login",
             "user_name": self.un,
             "user_password": self.pw,
-            "library": self.lib
+            "library": self.cn_lib
         }
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
@@ -72,7 +74,7 @@ class XInterface(object):
             "session": self.session,
             "id": uid,
             "verification": verification,
-            "library": "WHU50"
+            "library": self.au_lib
         }
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
@@ -92,7 +94,7 @@ class XInterface(object):
         params = {
             "op": "bor_info",
             "id": uid,
-            "library": "whu50",
+            "library": self.au_lib,
             "session": self.session
         }
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
@@ -115,16 +117,19 @@ class XInterface(object):
             'hold': hold_list
         }
 
-    def find(self, request='', code='wrd'):
+    def find(self, request='', code='wrd', lang='cn'):
         '''
         默认关键词检索
         :param request:
+        :param code:
+        :param lang:
         :return:
         '''
+        lib = self.cn_lib if lang == 'cn' else self.en_lib
         params = {
             "op": "find",
             "request": request,
-            "base": self.lib,
+            "base": lib,
             # "session": self.session,
             "code": code
         }
@@ -139,60 +144,90 @@ class XInterface(object):
                     'no_records': int(et.find('no_records').text),
                     'no_entries': int(et.find('no_entries').text)}
 
-    def present(self, set_number, set_entry):
+    def present(self, set_number, set_entry, lang='cn'):
         '''
         查询结果显示
         :param set_number:
         :param set_entry:
+        :param lang:
         :return:
         '''
+        lib = self.cn_lib if lang == 'cn' else self.en_lib
         params = {
             "op": "present",
             "set_number": set_number,
             "set_entry": '%d-%d' % (set_entry, set_entry + self.page_size - 1),
-            "base": self.lib,
+            "base": lib,
             # "session": self.session
         }
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
         records = et.findall('record')
         books = []
-        for record in records:
-            book = {}
-            book['doc_number'] = record.find('doc_number').text
-            title = record.find(".//varfield[@id='200']/subfield[@label='a']")
-            version = record.find(".//varfield[@id='205']/subfield[@label='a']")
-            publish = record.find(".//varfield[@id='210']/subfield[@label='c']")
-            year = record.find(".//varfield[@id='210']/subfield[@label='d']")
-            page = record.find(".//varfield[@id='215']/subfield[@label='a']")
-            description = record.find(".//varfield[@id='330']/subfield[@label='a']")
-            reader = record.find(".//varfield[@id='333']/subfield[@label='a']")
-            theme = record.find(".//varfield[@id='606']/subfield[@label='a']")
-            author = record.find(".//varfield[@id='701']/subfield[@label='a']")
-            isbn = record.find(".//varfield[@id='905']/subfield[@label='s']")
-            book['title'] = '' if title is None else title.text
-            book['version'] = '' if version is None else version.text
-            book['publish'] = '' if publish is None else publish.text
-            book['year'] = '' if year is None else year.text
-            book['page'] = '' if page is None else page.text
-            book['description'] = '' if description is None else description.text
-            book['reader'] = '' if reader is None else reader.text
-            book['author'] = '' if author is None else author.text
-            book['theme'] = '' if theme is None else theme.text
-            book['no_call'] = '' if isbn is None else isbn.text
-            books.append(book)
+        if lang == 'cn':
+            for record in records:
+                book = {}
+                book['doc_number'] = record.find('doc_number').text
+                title = record.find(".//varfield[@id='200']/subfield[@label='a']")
+                version = record.find(".//varfield[@id='205']/subfield[@label='a']")
+                publish = record.find(".//varfield[@id='210']/subfield[@label='c']")
+                year = record.find(".//varfield[@id='210']/subfield[@label='d']")
+                page = record.find(".//varfield[@id='215']/subfield[@label='a']")
+                description = record.find(".//varfield[@id='330']/subfield[@label='a']")
+                reader = record.find(".//varfield[@id='333']/subfield[@label='a']")
+                theme = record.find(".//varfield[@id='606']/subfield[@label='a']")
+                author = record.find(".//varfield[@id='701']/subfield[@label='a']")
+                isbn = record.find(".//varfield[@id='905']/subfield[@label='s']")
+                book['title'] = '' if title is None else title.text
+                book['version'] = '' if version is None else version.text
+                book['publish'] = '' if publish is None else publish.text
+                book['year'] = '' if year is None else year.text
+                book['page'] = '' if page is None else page.text
+                book['description'] = '' if description is None else description.text
+                book['reader'] = '' if reader is None else reader.text
+                book['author'] = '' if author is None else author.text
+                book['theme'] = '' if theme is None else theme.text
+                book['no_call'] = '' if isbn is None else isbn.text
+                books.append(book)
+        else:
+            for record in records:
+                book = {}
+                book['doc_number'] = record.find('doc_number').text
+                title = record.find(".//varfield[@id='245']/subfield[@label='a']")
+                version = record.find(".//varfield[@id='250']/subfield[@label='a']")
+                publish = record.find(".//varfield[@id='264']/subfield[@label='a']")
+                year = record.find(".//varfield[@id='264']/subfield[@label='c']")
+                page = record.find(".//varfield[@id='300']/subfield[@label='a']")
+                description = record.find(".//varfield[@id='505']/subfield[@label='a']")
+                reader = record.find(".//varfield[@id='333']/subfield[@label='a']")
+                theme = record.find(".//varfield[@id='650']/subfield[@label='a']")
+                author = record.find(".//varfield[@id='100']/subfield[@label='a']")
+                isbn = record.find(".//varfield[@id='905']/subfield[@label='s']")
+                book['title'] = '' if title is None else title.text
+                book['version'] = '' if version is None else version.text
+                book['publish'] = '' if publish is None else publish.text
+                book['year'] = '' if year is None else year.text
+                book['page'] = '' if page is None else page.text
+                book['description'] = '' if description is None else description.text
+                book['reader'] = '' if reader is None else reader.text
+                book['author'] = '' if author is None else author.text
+                book['theme'] = '' if theme is None else theme.text
+                book['no_call'] = '' if isbn is None else isbn.text
+                books.append(book)
         return books
 
-    def circ_status(self, sys_no):
+    def circ_status(self, sys_no, lang='cn'):
         '''
         馆藏信息查询
         :param sys_no:
+        :param lang:
         :return:
         '''
+        lib = self.cn_lib if lang == 'cn' else self.en_lib
         params = {
             "op": "circ-status",
             "sys_no": sys_no,
-            "library": self.lib,
+            "library": lib,
             # "session": self.session
         }
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
@@ -221,7 +256,7 @@ class XInterface(object):
         params = {
             "op": "renew",
             "item_barcode": bar_code,
-            "library": "whu50",
+            "library": self.au_lib,
             "bor_id": bor_id,
             "session": self.session
         }
@@ -247,9 +282,9 @@ class XInterface(object):
         :return:
         '''
         params = {
-            "op": "hold-req-cancel",
+            "op": "hold-req",
             "item_barcode": bar_code,
-            "library": "whu50",
+            "library": self.au_lib,
             "id": bor_id,
             "pickup_loc": pickup_loc,
             "session": self.session
@@ -275,7 +310,7 @@ class XInterface(object):
         params = {
             "op": "hold-req-cancel",
             "doc_number": doc_number,
-            "library": "whu50",
+            "library": self.au_lib,
             "id": bor_id,
             "item_sequence": item_sequence,
             "sequence": sequence,
@@ -373,15 +408,15 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
-    xi.circ_status(sys_no='001165085')
-    set_info = xi.find(request='东野圭吾', code='wau')
-    present_info = xi.present(set_number=set_info['set_number'], set_entry=1)
+    set_info = xi.find(request='math', code='wrd', lang='en')
+    present_info = xi.present(set_number=set_info['set_number'], set_entry=1, lang='en')
+    xi.circ_status(sys_no=present_info[0]['doc_number'], lang='en')
     auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
     xi.x_bor_info(bor_id='2016302590080')
     xi.loan_history_detail(bor_id='2016302590080')
     xi.bor_info(uid='2016302590080')
     xi.renew(bor_id='2016302590080', bar_code='101100356208')
-    xi.hold_req_nlc(bor_id=auth['bor_id'], bar_code='101102121871', pickup_loc='XX')
     set_info = xi.find(request='高等数学')
     xi.bor_auth(uid='2015302590005', verification='180856')
+    xi.hold_req_nlc(bor_id='ID900122044', bar_code='101102284999', pickup_loc='WL')
 
