@@ -156,8 +156,7 @@ class XInterface(object):
         params = {
             "op": "present",
             "set_number": set_number,
-            # "set_entry": '%d-%d' % (set_entry, set_entry + self.page_size - 1),
-            "set_entry": '121-130',
+            "set_entry": '%d-%d' % (set_entry, set_entry + self.page_size - 1),
             "base": lib,
             # "session": self.session
         }
@@ -414,7 +413,7 @@ if __name__ == '__main__':
     xi.loan_history_detail(bor_id='2015302590030')
     xi.x_bor_info(bor_id='2015302590078')
     set_info = xi.find(request='东野圭吾', code='wau')
-    present_info = xi.present(set_number=set_info['set_number'], set_entry=1)
+    present_info = xi.present(set_number='009410', set_entry=1, lang='cn')
     xi.circ_status(sys_no=present_info[0]['doc_number'])
     auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
     xi.renew(bor_id='2016302590080', bar_code='101100356208')
