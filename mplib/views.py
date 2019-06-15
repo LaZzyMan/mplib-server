@@ -44,14 +44,15 @@ class LibUserViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False)
     def login(self, request):
         user = models.User.objects.get(session=request.query_params.get('session', ''))
-        session = check_session(user.session)
         auth = self.xi.bor_auth_valid(uid=request.query_params.get('libId', ''),
                                       verification=request.query_params.get('libPsw', ''))
         if auth['result'] == 1:
+            session = check_session(user.session)
             return Response({'status': 1, 'session': session})
         else:
             try:
                 lu = models.LibUser.objects.get(libId=request.query_params.get('libId', ''))
+                session = check_session(user.session)
                 return Response({'status': 0, 'user': {'name': lu.name, 'bor_id': lu.libId, 'department': lu.department, 'reader_type': lu.readerType}, 'session': session})
             except:
                 result_json = {}
@@ -67,6 +68,7 @@ class LibUserViewSet(viewsets.ModelViewSet):
                                     registrationDate=datetime.strptime(result_json['z305_registration_date'], '%Y%m%d'),
                                     expiryDate=datetime.strptime(result_json['z305_expiry_date'], '%Y%m%d'))
                 lu.save()
+                session = check_session(user.session)
                 return Response({'status': 0, 'user': {'name': lu.name, 'bor_id': lu.libId, 'department': lu.department, 'reader_type': lu.readerType}, 'session': session})
 
     @action(methods=['get'], detail=False)
@@ -223,10 +225,11 @@ class UserViewSet(viewsets.ModelViewSet):
     def vertify_session(self, request):
         try:
             user = models.User.objects.get(session=request.query_params.get('session', ''))
-            session = check_session(user.session)
             if user.libAccount is None:
+                session = check_session(user.session)
                 return Response({'login': True, 'libBind': False, 'session': session})
             else:
+                session = check_session(user.session)
                 return Response({'login': True, 'libBind': True, 'session': session})
         except:
             return Response({'login': False, 'libBind': False})
@@ -245,12 +248,13 @@ class UserViewSet(viewsets.ModelViewSet):
         response = requests.request("GET", url, data='', headers=headers, params=querystring)
         result = response.json()
         user = models.User.objects.get(session=request.query_params.get('session', ''))
-        session = check_session(user.session)
         if result['errorcode'] == 0:
             user.wxSessionKey = result['session_key']
             user.save()
+            session = check_session(user.session)
             return Response({'status': 0, 'session': session})
         else:
+            session = check_session(user.session)
             return Response({'status': 1, 'session': session})
 
     @action(methods=['get'], detail=False)
@@ -300,10 +304,10 @@ class UserViewSet(viewsets.ModelViewSet):
     def bind_lib(self, request):
         try:
             user = models.User.objects.get(session=request.query_params.get('session', ''))
-            session = check_session(user.session)
             libuser = models.LibUser.objects.get(libId=request.query_params.get('libId', ''))
             user.libAccount = libuser
             user.save()
+            session = check_session(user.session)
             return Response({'status': 0, 'session': session})
         except:
             return Response({'status': 1})
@@ -311,9 +315,9 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False)
     def unbind_lib(self, request):
         user = models.User.objects.get(session=request.query_params.get('session', ''))
-        session = check_session(user.session)
         user.libAccount = None
         user.save()
+        session = check_session(user.session)
         return Response({'status': 0, 'session': session})
 
 
