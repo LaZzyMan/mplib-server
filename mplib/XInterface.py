@@ -26,7 +26,7 @@ class XInterface(object):
         self.cn_lib = 'whu01'
         self.en_lib = 'whu09'
         self.au_lib = 'whu50'
-        self.session = self.login()
+        self.session = 'JBFFMX341JSGLLRJYYADPBCN33HEM5D356P9R2G5JK7VRQ6NX5'
         self.page_size = PAGE_SIZE
         self.alpha_psw = alpha_psw
 
@@ -408,6 +408,7 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
+    auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
     xi.hold_req_nlc(bor_id='ID900122044', bar_code='101102121872', pickup_loc='XX')
     xi.bor_info(uid='2015302590078')
     xi.loan_history_detail(bor_id='2015302590030')
@@ -415,7 +416,6 @@ if __name__ == '__main__':
     set_info = xi.find(request='东野圭吾', code='wau')
     present_info = xi.present(set_number='009410', set_entry=1, lang='cn')
     xi.circ_status(sys_no=present_info[0]['doc_number'])
-    auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
     xi.renew(bor_id='2016302590080', bar_code='101100356208')
     set_info = xi.find(request='高等数学')
     xi.bor_auth(uid='2015302590005', verification='180856')

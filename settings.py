@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'mplib.apps.MplibConfig',
     'rest_framework',
     'rest_framework_swagger',
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,5 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 }
+
+CRONJOBS = ['*/1 * * * *', 'mplib.task.update', '>> mplib/task.log']

@@ -42,6 +42,10 @@ class LibUserViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.LibUserSerializer
 
     @action(methods=['get'], detail=False)
+    def update_session(self, request):
+        self.xi.session = self.xi.login()
+
+    @action(methods=['get'], detail=False)
     def login(self, request):
         user = models.User.objects.get(session=request.query_params.get('session', ''))
         auth = self.xi.bor_auth_valid(uid=request.query_params.get('libId', ''),
