@@ -3,6 +3,8 @@ import requests
 import xml.etree.ElementTree as ET
 import chardet
 from django.utils.http import urlquote
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime
 
 URL = 'http://opac.lib.whu.edu.cn/X'
 ALPHA_URL = 'http://api.lib.whu.edu.cn/aleph-x/bor/oper'
@@ -26,9 +28,16 @@ class XInterface(object):
         self.cn_lib = 'whu01'
         self.en_lib = 'whu09'
         self.au_lib = 'whu50'
-        self.session = 'JBFFMX341JSGLLRJYYADPBCN33HEM5D356P9R2G5JK7VRQ6NX5'
+        self.session = self.login()
         self.page_size = PAGE_SIZE
         self.alpha_psw = alpha_psw
+        self.scheduler = BackgroundScheduler()
+        self.scheduler.add_job(self.update, 'interval', seconds=60, id='update session')
+        self.scheduler.start()
+
+    def update(self):
+        print(str(datetime.now()) + ': Update Session')
+        self.session = self.login()
 
     def login(self):
         '''
