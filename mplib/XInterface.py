@@ -32,7 +32,7 @@ class XInterface(object):
         self.page_size = PAGE_SIZE
         self.alpha_psw = alpha_psw
         self.scheduler = BackgroundScheduler()
-        self.scheduler.add_job(self.update, 'interval', seconds=60, id='update session')
+        self.scheduler.add_job(self.update, 'interval', seconds=3600, id='update session')
         self.scheduler.start()
 
     def update(self):
