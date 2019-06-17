@@ -33,6 +33,7 @@ user/update_session
 #### 参数
 
 - code
+- session
 
 #### 返回
 
@@ -157,7 +158,7 @@ libuser/borrow_info
 
 ### 预约信息
 
-libuser/loan_info
+libuser/hold_info
 
 #### 参数
 

@@ -117,10 +117,12 @@ class XInterface(object):
         holds = et.findall('item-h')
         for hold in holds:
             hold_list.append({'hold_info': self.z37_to_dict(hold.find('z37')),
-                              'book_info': self.z13_to_dict(hold.find('z13'))})
+                              'book_info': self.z13_to_dict(hold.find('z13')),
+                              'bar_code': hold.find('./z30/z30-barcode').text})
         for loan in loans:
             loan_list.append({'loan_info': self.z36_to_dict(loan.find('z36')),
-                              'book_info': self.z13_to_dict(loan.find('z13'))})
+                              'book_info': self.z13_to_dict(loan.find('z13')),
+                              'bar_code': loan.find('./z30/z30-barcode').text})
         return {
             'loan': loan_list,
             'hold': hold_list
@@ -417,15 +419,15 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
+    xi.bor_info(uid='2017203060007')
+    xi.renew(bor_id='2016302590080', bar_code='101100356208')
     auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
     xi.hold_req_nlc(bor_id='ID900122044', bar_code='101102121872', pickup_loc='XX')
-    xi.bor_info(uid='2015302590078')
     xi.loan_history_detail(bor_id='2015302590030')
     xi.x_bor_info(bor_id='2015302590078')
     set_info = xi.find(request='东野圭吾', code='wau')
     present_info = xi.present(set_number='009410', set_entry=1, lang='cn')
     xi.circ_status(sys_no=present_info[0]['doc_number'])
-    xi.renew(bor_id='2016302590080', bar_code='101100356208')
     set_info = xi.find(request='高等数学')
     xi.bor_auth(uid='2015302590005', verification='180856')
 
