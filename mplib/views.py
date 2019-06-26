@@ -164,25 +164,21 @@ class LibUserViewSet(viewsets.ModelViewSet):
         user = models.User.objects.get(session=session)
         session = check_session(session)
         result = self.xi.hold_req_cancel(doc_number=doc_number, item_sequence=item_sequence, sequence=sequence, bor_id=user.libAccount.libBorId)
+        return Response({'status': 0, 'result': result, 'session': session})
+
+    @action(methods=['get'], detail=False)
+    def bor_rank(self, request):
+        session = request.query_params.get('session', '')
+        lang = request.query_params.get('lang', 'ALL')
+        time = request.query_params.get('time', 'y')
+        category = request.query_params.get('category', 'ALL')
+        user = models.User.objects.get(session=session)
+        session = check_session(session)
+        result = self.xi.bor_rank(lang=lang, time=time, category=category)
         if result['result'] == 0:
             return Response({'status': 0, 'session': session})
         else:
             return Response({'status': 1, 'session': session})
-
-    @action(methods=['get'], detail=False)
-    def rank(self, request):
-        search = []
-        for i in range(20):
-            search.append({
-                "name": "明朝那些事",
-                "author": "当年明月",
-                "rank": i + 1,
-                "rate": 9.0,
-                "borrowTimes": 900
-            })
-        if len(search) > 10:
-            search = search[:10]
-        return Response(search)
 
     @action(methods=['get'], detail=False)
     def notice(self, request):

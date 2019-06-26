@@ -3,12 +3,14 @@ import requests
 import xml.etree.ElementTree as ET
 import chardet
 from django.utils.http import urlquote
+from bs4 import BeautifulSoup
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
+import re
 
 URL = 'http://opac.lib.whu.edu.cn/X'
 ALPHA_URL = 'http://api.lib.whu.edu.cn/aleph-x/bor/oper'
-PAGE_SIZE = 10
+PAGE_SIZE = 20
 HEADERS = {'Cache-Control': "no-cache", 'Postman-Token': "0f969060-6547-41d2-8fca-40a13b2a0483"}
 
 
@@ -32,10 +34,10 @@ class XInterface(object):
         self.page_size = PAGE_SIZE
         self.alpha_psw = alpha_psw
         self.scheduler = BackgroundScheduler()
-        self.scheduler.add_job(self.update, 'interval', seconds=3600, id='update session')
+        self.scheduler.add_job(self.update_session, 'interval', seconds=3600, id='update session')
         self.scheduler.start()
 
-    def update(self):
+    def update_session(self):
         print(str(datetime.now()) + ': Update Session')
         self.session = self.login()
 
@@ -304,10 +306,14 @@ class XInterface(object):
         et = ET.fromstring(response.content.decode('utf-8'))
         self.session = et.find('session-id').text
         try:
-            err_message = et.find('error').text
-            return {'result': 1, 'error': err_message}
+            reply = et.find('reply').text
+            if reply == 'ok':
+                return {'result': 0}
+            else:
+                return {'result': 1}
         except AttributeError as _:
-            return {'result': 0}
+            print(response.content.decode('utf-8'))
+            return {'result': 1}
 
     def hold_req_cancel(self, doc_number, bor_id, item_sequence, sequence):
         '''
@@ -367,6 +373,26 @@ class XInterface(object):
         result = response.json()
         return result
 
+    def bor_rank(self, lang='ALL', category='ALL', time='y'):
+        '''
+        :param lang: ALL, 01, 09
+        :param category: ALL, A-Z
+        :param time: y, s, m, w
+        :return:
+        '''
+        base_url = "http://opac.lib.whu.edu.cn/opac_lcl_chi/loan_top_ten/loan"
+        url = base_url + '.' + lang + '.' + category + '.' + time
+        response = requests.request("GET", url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        rank = []
+        for ol in soup.find_all('ol'):
+            for item in ol.find_all('a'):
+                rank.append({'doc_number': item['url'].split('&')[-1].split('=')[1],
+                             'bor_num': int(item.text.split('    ')[1].split(':')[1]),
+                             'title': item.text.split('    ')[0].split('(')[0],
+                             'author': re.findall('\((.*?)\)', item.text.split('    ')[0])[-1].strip()})
+        return rank
+
     @staticmethod
     def z13_to_dict(et):
         return {
@@ -419,15 +445,16 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
-    xi.bor_info(uid='2017203060007')
+    xi.circ_status(sys_no='001350497')
+    xi.bor_rank()
+    xi.bor_info(uid='2016302590080')
+    xi.hold_req_nlc(bor_id='ID900139600', bar_code='101101976985', pickup_loc='WL')
     xi.renew(bor_id='2016302590080', bar_code='101100356208')
     auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
-    xi.hold_req_nlc(bor_id='ID900122044', bar_code='101102121872', pickup_loc='XX')
     xi.loan_history_detail(bor_id='2015302590030')
     xi.x_bor_info(bor_id='2015302590078')
     set_info = xi.find(request='东野圭吾', code='wau')
     present_info = xi.present(set_number='009410', set_entry=1, lang='cn')
-    xi.circ_status(sys_no=present_info[0]['doc_number'])
     set_info = xi.find(request='高等数学')
     xi.bor_auth(uid='2015302590005', verification='180856')
 

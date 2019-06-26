@@ -140,6 +140,22 @@ libuser/book_detail
 - status
 - result
 
+libuser/bor_rank
+
+#### 参数
+
+- session
+- lang: 01, 09, ALL
+- category: ALL, A-Z
+- time: y, s, w, m
+
+#### 返回
+
+- session
+- status
+- result
+
+
 ## 借阅相关
 
 ### 借阅信息
