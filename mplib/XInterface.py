@@ -295,7 +295,7 @@ class XInterface(object):
         :return:
         '''
         params = {
-            "op": "hold-req",
+            "op": "hold-req-nlc",
             "item_barcode": bar_code,
             "library": self.au_lib,
             "id": bor_id,
