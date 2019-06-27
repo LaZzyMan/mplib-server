@@ -11,7 +11,9 @@ import json
 import requests
 import uuid
 from mplib import serializers, models
-import rsa
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_v1_5
+import base64
 from mplib.encryption import PRIVATE_KEY
 from django.contrib.auth.hashers import make_password, check_password
 
@@ -68,10 +70,10 @@ class LibUserViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=False)
     def login(self, request):
-        key = rsa.PrivateKey.load_pkcs1(PRIVATE_KEY)
+        key = RSA.importKey(PRIVATE_KEY)
         user = models.User.objects.get(session=request.query_params.get('session', ''))
         rsa_psw = request.query_params.get('libPsw', '')
-        clear_psw = rsa.decrypt(rsa_psw.encode('utf-8'), key)
+        clear_psw = PKCS1_v1_5.new(key).decrypt(base64.b64decode(rsa_psw), None).decode()
         auth = self.xi.bor_auth_valid(uid=request.query_params.get('libId', ''),
                                       verification=clear_psw)
         if auth['result'] == 1:
