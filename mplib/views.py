@@ -196,10 +196,7 @@ class LibUserViewSet(viewsets.ModelViewSet):
         user = models.User.objects.get(session=session)
         session = check_session(session)
         result = self.xi.bor_rank(lang=lang, time=time, category=category)
-        if result['result'] == 0:
-            return Response({'status': 0, 'session': session})
-        else:
-            return Response({'status': 1, 'session': session})
+        return Response({'status': 0, 'session': session, 'result': result})
 
     @action(methods=['get'], detail=False)
     def notice(self, request):

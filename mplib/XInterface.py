@@ -461,7 +461,9 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
-    # xi.item_data_nlc(doc_number='001350497')
+    set_info = xi.find(request='东野圭吾', code='wau')
+    present_info = xi.present(set_number='076131', set_entry=1, lang='cn')
+    xi.item_data_nlc(doc_number='001351039')
     # xi.circ_status(sys_no='001350497')
     xi.bor_rank()
     xi.bor_info(uid='2017302590216')
@@ -470,8 +472,6 @@ if __name__ == '__main__':
     auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
     xi.loan_history_detail(bor_id='2015302590030')
     xi.x_bor_info(bor_id='2015302590078')
-    set_info = xi.find(request='东野圭吾', code='wau')
-    present_info = xi.present(set_number='009410', set_entry=1, lang='cn')
     set_info = xi.find(request='高等数学')
     xi.bor_auth(uid='2015302590005', verification='180856')
 
