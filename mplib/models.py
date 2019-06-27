@@ -6,7 +6,7 @@ from django.db import models
 class LibUser(models.Model):
     libId = models.CharField(verbose_name='lib id', max_length=30, primary_key=True)
     libBorId = models.CharField(verbose_name='lib bor id', max_length=50, null=True)
-    libPsw = models.CharField(verbose_name='lib password', max_length=30)
+    libPsw = models.CharField(verbose_name='lib password', max_length=200)
     name = models.CharField(verbose_name='name', max_length=20, null=True)
     department = models.CharField(verbose_name='name', max_length=100, null=True)
     readerType = models.CharField(verbose_name='name', max_length=20, null=True)
