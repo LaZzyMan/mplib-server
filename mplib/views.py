@@ -11,6 +11,9 @@ import json
 import requests
 import uuid
 from mplib import serializers, models
+import rsa
+from mplib.encryption import PRIVATE_KEY
+from django.contrib.auth.hashers import make_password, check_password
 
 
 class TimeFilter(filters.BaseFilterBackend):
@@ -65,15 +68,21 @@ class LibUserViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=False)
     def login(self, request):
+        key = rsa.PrivateKey.load_pkcs1(PRIVATE_KEY)
         user = models.User.objects.get(session=request.query_params.get('session', ''))
+        rsa_psw = request.query_params.get('libPsw', '')
+        clear_psw = rsa.decrypt(rsa_psw.encode('utf-8'), key)
         auth = self.xi.bor_auth_valid(uid=request.query_params.get('libId', ''),
-                                      verification=request.query_params.get('libPsw', ''))
+                                      verification=clear_psw)
         if auth['result'] == 1:
             session = check_session(user.session)
             return Response({'status': 1, 'session': session})
         else:
             try:
                 lu = models.LibUser.objects.get(libId=request.query_params.get('libId', ''))
+                if not check_password(clear_psw, lu.libPsw):
+                    lu.libPsw = make_password(clear_psw)
+                    lu.save()
                 session = check_session(user.session)
                 return Response({'status': 0, 'user': {'name': lu.name, 'bor_id': lu.libId, 'department': lu.department, 'reader_type': lu.readerType}, 'session': session})
             except:
@@ -83,7 +92,7 @@ class LibUserViewSet(viewsets.ModelViewSet):
                     result_json[i['name']] = i['value']
                 lu = models.LibUser(libId=request.query_params.get('libId', ''),
                                     libBorId=result_json['z303_id'],
-                                    libPsw=request.query_params.get('libPsw', ''),
+                                    libPsw=make_password(clear_psw),
                                     name=result_json['reader-name'],
                                     department=result_json['reader-department'],
                                     readerType=result_json['reader-type'],
