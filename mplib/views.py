@@ -171,7 +171,7 @@ class LibUserViewSet(viewsets.ModelViewSet):
         if result['result'] == 0:
             return Response({'status': 0, 'session': session})
         else:
-            return Response({'status': 1, 'session': session})
+            return Response({'status': 1, 'session': session, 'err_msg': result['err_msg']})
 
     @action(methods=['get'], detail=False)
     def hold_req_cancel(self, request):
@@ -182,7 +182,10 @@ class LibUserViewSet(viewsets.ModelViewSet):
         user = models.User.objects.get(session=session)
         session = check_session(session)
         result = self.xi.hold_req_cancel(doc_number=doc_number, item_sequence=item_sequence, sequence=sequence, bor_id=user.libAccount.libBorId)
-        return Response({'status': 0, 'result': result, 'session': session})
+        if result['result'] == 0:
+            return Response({'status': 0, 'session': session})
+        else:
+            return Response({'status': 1, 'session': session})
 
     @action(methods=['get'], detail=False)
     def bor_rank(self, request):

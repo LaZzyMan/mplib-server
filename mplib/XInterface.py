@@ -312,8 +312,12 @@ class XInterface(object):
             else:
                 return {'result': 1}
         except AttributeError as _:
-            print(response.content.decode('utf-8'))
-            return {'result': 1}
+            error = et.find('error-text-1')
+            if not error is None:
+                return {'result': 1, 'err_msg': error.text}
+            else:
+                print(response.content.decode('utf-8'))
+                return {'result': 1, 'err_msg': 'unknown'}
 
     def hold_req_cancel(self, doc_number, bor_id, item_sequence, sequence):
         '''
@@ -393,6 +397,18 @@ class XInterface(object):
                              'author': re.findall('\((.*?)\)', item.text.split('    ')[0])[-1].strip()})
         return rank
 
+    def item_data_nlc(self, doc_number, lang='cn'):
+        lib = self.cn_lib if lang == 'cn' else self.en_lib
+        params = {
+            "op": "item_data_nlc",
+            "doc_number": doc_number,
+            "base": lib,
+            "session": self.session
+        }
+        response = requests.request('GET', url=self.url, headers=self.headers, params=params)
+        et = ET.fromstring(response.content.decode('utf-8'))
+        items = et.findall('item-data')
+
     @staticmethod
     def z13_to_dict(et):
         return {
@@ -445,10 +461,11 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
-    xi.circ_status(sys_no='001350497')
+    # xi.item_data_nlc(doc_number='001350497')
+    # xi.circ_status(sys_no='001350497')
     xi.bor_rank()
-    xi.bor_info(uid='2016302590080')
-    xi.hold_req_nlc(bor_id='ID900139600', bar_code='101101976985', pickup_loc='WL')
+    xi.bor_info(uid='2017302590216')
+    xi.hold_req_nlc(bor_id='ID900162486', bar_code='101102382884', pickup_loc='WL')
     xi.renew(bor_id='2016302590080', bar_code='101100356208')
     auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
     xi.loan_history_detail(bor_id='2015302590030')
