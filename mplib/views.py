@@ -12,6 +12,24 @@ import requests
 import uuid
 from mplib import serializers, models
 
+
+class TimeFilter(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        time = request.query_params.get('time', None)
+        if time is not None:
+            return queryset.filter(year=time)
+        else:
+            return queryset
+
+
+class TypeFilter(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        type = request.query_params.get('type', None)
+        if type is not None:
+            return queryset.filter(region=type)
+        else:
+            return queryset
+
 # Create your views here.
 
 
@@ -321,6 +339,12 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
         session = check_session(user.session)
         return Response({'status': 0, 'session': session})
+
+
+class NoticeViewSet(viewsets.ModelViewSet):
+    queryset = models.Notice.objects.all()
+    serializer_class = serializers.NoticeSerializer
+    filter_backends = (TimeFilter, TypeFilter, )
 
 
 schema_view = get_swagger_view(title='Lib Mini Program API', url=None)

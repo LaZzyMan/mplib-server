@@ -33,4 +33,17 @@ class User(models.Model):
         return self.nickName
 
 
+class Notice(models.Model):
+    id = models.CharField(verbose_name='ID', max_length=100, primary_key=True, null=False)
+    url = models.CharField(verbose_name='URL', max_length=200, null=True, blank=True)
+    urlEnable = models.BooleanField(verbose_name='使用URL')
+    title = models.CharField(verbose_name='标题', max_length=200, null=False, blank=False)
+    contents = models.TextField(verbose_name='内容', null=True, blank=True)
+    type = models.CharField(max_length=10, choices=(('N', '通知公告'), ('Z', '资源动态'), ('P', '培训活动')))
+    publishTime = models.DateTimeField(verbose_name='发布时间', null=False)
+
+    def __str__(self):
+        return self.title
+
+
 
