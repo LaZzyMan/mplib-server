@@ -26,3 +26,4 @@ urllib3==1.25.3
 APScheduler=3.6.0
 beautifulsoup4=4.7.1
 rsa=4.0
+django-simpleui=2.1.5
