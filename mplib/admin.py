@@ -25,7 +25,7 @@ class NoticeAdmin(admin.ModelAdmin):
     list_per_page = 30
     view_on_site = False
     list_display = ('id', 'title', 'publishTime', 'pubUser', 'urlEnable', 'color_stats')
-    ordering = ('-publishTime')
+    # ordering = ('-publishTime')
     list_filter = ('type', 'urlEnable', 'stats', 'pubUser')
     search_fields = ('title', 'contents')
     date_hierarchy = 'publishTime'
