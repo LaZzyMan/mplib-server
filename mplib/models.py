@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User as AdminUser
 
 # Create your models here.
 
@@ -12,6 +13,10 @@ class LibUser(models.Model):
     readerType = models.CharField(verbose_name='name', max_length=20, null=True)
     registrationDate = models.DateField(verbose_name='registration date', null=True)
     expiryDate = models.DateField(verbose_name='expiry data', null=True)
+
+    class Meta:
+        verbose_name = '图书馆用户管理'
+        verbose_name_plural = '图书馆用户管理'
 
 
 class User(models.Model):
@@ -32,6 +37,10 @@ class User(models.Model):
     def __str__(self):
         return self.nickName
 
+    class Meta:
+        verbose_name = '小程序用户管理'
+        verbose_name_plural = '小程序用户管理'
+
 
 class Notice(models.Model):
     id = models.CharField(verbose_name='ID', max_length=100, primary_key=True, null=False)
@@ -41,6 +50,12 @@ class Notice(models.Model):
     contents = models.TextField(verbose_name='内容', null=True, blank=True)
     type = models.CharField(max_length=10, choices=(('N', '通知公告'), ('Z', '资源动态'), ('P', '培训活动')))
     publishTime = models.DateTimeField(verbose_name='发布时间', null=False)
+    stats = models.BooleanField(verbose_name='发布状态')
+    pubUser = models.ForeignKey(AdminUser, verbose_name='发布者', on_delete=models.SET_NULL, blank=True, null=True, db_index=True, related_name='username')
+
+    class Meta:
+        verbose_name = '通知公告管理'
+        verbose_name_plural = '通知公告管理'
 
     def __str__(self):
         return self.title
