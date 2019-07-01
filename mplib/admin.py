@@ -2,6 +2,7 @@ from django.contrib import admin
 from mplib.models import Notice, LibUser, User
 import uuid
 from django.contrib import messages
+from django.contrib.auth.models import User as AdminUser
 from django.utils.html import format_html
 
 
@@ -37,8 +38,7 @@ class NoticeAdmin(admin.ModelAdmin):
     color_stats.boolean = True
 
     def save_model(self, request, obj, form, change):
-        messages.error(request, request.user)
-        obj.pub_user = request.user
+        obj.pub_user = AdminUser.objects.get(username=request.user)
         obj.id = uuid.uuid1()
         obj.stats = False
         if obj.title == '':
