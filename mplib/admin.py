@@ -1,6 +1,7 @@
 from django.contrib import admin
 from mplib.models import Notice, LibUser, User, Activity, Advise
 import uuid
+import logging
 from django.contrib import messages
 from django.contrib.auth.models import User as AdminUser
 from mplib import models
@@ -39,6 +40,7 @@ class ActivityForm(forms.ModelForm):
     def clean(self):
         urlEnable = self.cleaned_data['urlEnable']
         img = self.cleaned_data['actImg']
+        logging.debug(type(img))
         print(img)
         if urlEnable:
             if self.cleaned_data['url'] is None:
