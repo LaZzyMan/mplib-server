@@ -132,6 +132,11 @@ STATIC_ROOT = '/var/www/html/'
 
 REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
-'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 }
+
+SIMPLEUI_INDEX = 'http://www.lib.whu.edu.cn/web/default.asp'
+SIMPLEUI_HOME_PAGE = 'https://system.lib.whu.edu.cn/mp/admin/'
+SIMPLEUI_HOME_TITLE = '武汉大学图书馆'
+SIMPLEUI_HOME_ICON = 'book-open'
