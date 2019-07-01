@@ -33,7 +33,7 @@ class NoticeForm(forms.ModelForm):
 
 class ActivityForm(forms.ModelForm):
     class Meta:
-        model = models.Notice
+        model = models.Activity
         fields = ['title', 'urlEnable', 'url', 'contents', 'publishTime', 'actImg']
 
     def clean(self):
