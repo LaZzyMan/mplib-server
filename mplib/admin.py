@@ -37,6 +37,7 @@ class NoticeAdmin(admin.ModelAdmin):
     color_stats.boolean = True
 
     def save_model(self, request, obj, form, change):
+        messages.error(request, request.user)
         obj.pub_user = request.user
         obj.id = uuid.uuid1()
         obj.stats = False
@@ -44,7 +45,6 @@ class NoticeAdmin(admin.ModelAdmin):
             messages.error(request, '标题不能为空.')
             return
         if obj.urlEnable:
-            return
             if obj.url == '':
                 messages.error(request, '启用URL时，URL不能为空.')
                 return
