@@ -48,15 +48,11 @@ class NoticeAdmin(admin.ModelAdmin):
         queryset.update(stats=True)
 
     publish_notices.short_description = '发布选中的公告'
+    publish_notices.allowed_permissions = ('publish', )
 
-    def get_actions(self, request):
-        actions = super(NoticeAdmin, self).get_actions(request)
-        action = actions['delete_selected']
-        if 'mplib.publish_notice' in request.user.get_all_permissions():
-            actions['publish_notices'] = (self.publish_notices, '发布', '发布选中的公告')
-        del actions['delete_selected']
-        actions['delete_selected'] = action
-        return actions
+    def has_publish_permission(self, request):
+        opts = self.opts
+        return request.user.has_perm('%s.%s' % (opts.app_label, 'publish_notice'))
 
     def color_stats(self, obj):
         return obj.stats
