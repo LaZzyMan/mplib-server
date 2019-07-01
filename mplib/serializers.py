@@ -31,7 +31,8 @@ class ActivitySerializer(serializers.ModelSerializer):
         return obj.pubUser.username
 
     def get_img_url(self, obj):
-        return 'https://system.lib.whu.edu.cn/mp/upload/' + obj.actImg
+        return obj.actImg.image.url
+        # return 'https://system.lib.whu.edu.cn/mp/upload/' + obj.actImg
 
 
 class AdviseSerializer(serializers.ModelSerializer):
