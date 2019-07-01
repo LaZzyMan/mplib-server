@@ -51,7 +51,8 @@ class Notice(models.Model):
     type = models.CharField(verbose_name='公告分类', max_length=10, choices=(('N', '通知公告'), ('Z', '资源动态'), ('P', '培训活动')))
     publishTime = models.DateTimeField(verbose_name='发布时间', null=False)
     stats = models.BooleanField(verbose_name='发布状态')
-    pubUser = models.ForeignKey(AdminUser, verbose_name='发布者', on_delete=models.SET_NULL, blank=True, null=True, db_index=True, related_name='pub_user')
+    pubUser = models.ForeignKey(AdminUser, verbose_name='发布者', on_delete=models.SET_NULL, blank=True, null=True,
+                                db_index=True, related_name='notice_pub_user')
 
     class Meta:
         verbose_name = '通知公告管理'
@@ -71,7 +72,7 @@ class Activity(models.Model):
     publishTime = models.DateTimeField(verbose_name='发布时间', null=False)
     stats = models.BooleanField(verbose_name='发布状态')
     pubUser = models.ForeignKey(AdminUser, verbose_name='发布者', on_delete=models.SET_NULL, blank=True, null=True,
-                                db_index=True, related_name='pub_user')
+                                db_index=True, related_name='act_pub_user')
     actImg = models.ImageField(verbose_name='活动图片', upload_to='activity_img')
 
     class Meta:
@@ -90,7 +91,7 @@ class Advise(models.Model):
     publishTime = models.DateTimeField(verbose_name='投诉时间', null=False)
     stats = models.BooleanField(verbose_name='受理状态')
     solveUser = models.ForeignKey(AdminUser, verbose_name='受理者', on_delete=models.SET_NULL, blank=True, null=True,
-                                  db_index=True, related_name='pub_user')
+                                  db_index=True, related_name='solve_user')
     result = models.TextField(verbose_name='受理结果', null=True, blank=True)
 
     class Meta:
