@@ -3,12 +3,26 @@ from mplib.models import Notice, LibUser, User
 import uuid
 from django.contrib import messages
 from django.contrib.auth.models import User as AdminUser
+from mplib import models
+from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 
 
 admin.site.site_header = '图书馆小程序后台管理系统'
 admin.site.site_title = '武汉大学图书馆'
+admin.site.empty_value_display = '-empty-'
 # Register your models here.
+
+
+class NoticeForm(forms.ModelForm):
+    class Meta:
+        model = models.Notice
+        fields = ['title', 'type', 'urlEnable', 'url', 'contents', 'publishTime']
+
+    def clean(self):
+        raise ValidationError(self.cleaned_data['title'])
+        self.super().clean()
 
 
 @admin.register(User)
@@ -23,6 +37,7 @@ class LibUserAdmin(admin.ModelAdmin):
 
 @admin.register(Notice)
 class NoticeAdmin(admin.ModelAdmin):
+    form = NoticeForm
     list_per_page = 30
     view_on_site = False
     list_display = ('id', 'title', 'publishTime', 'pubUser', 'urlEnable', 'color_stats')
@@ -38,8 +53,7 @@ class NoticeAdmin(admin.ModelAdmin):
     color_stats.boolean = True
 
     def save_model(self, request, obj, form, change):
-        obj.pub_user = AdminUser.objects.get(username=request.user)
-        messages.error(request, obj.pub_user.username)
+        obj.pubUser = AdminUser.objects.get(username=request.user)
         obj.id = uuid.uuid1()
         obj.stats = False
         if obj.title == '':
@@ -51,4 +65,4 @@ class NoticeAdmin(admin.ModelAdmin):
                 return
         elif obj.contents == '':
             messages.error(request, '不启用URL时，内容不能为空.')
-        obj.save()
+        super(NoticeAdmin, self).save_model(request, obj, form, change)

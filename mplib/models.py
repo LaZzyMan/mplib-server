@@ -48,7 +48,7 @@ class Notice(models.Model):
     urlEnable = models.BooleanField(verbose_name='使用URL')
     title = models.CharField(verbose_name='标题', max_length=200, null=False, blank=False)
     contents = models.TextField(verbose_name='内容', null=True, blank=True)
-    type = models.CharField(max_length=10, choices=(('N', '通知公告'), ('Z', '资源动态'), ('P', '培训活动')))
+    type = models.CharField(verbose_name='公告分类', max_length=10, choices=(('N', '通知公告'), ('Z', '资源动态'), ('P', '培训活动')))
     publishTime = models.DateTimeField(verbose_name='发布时间', null=False)
     stats = models.BooleanField(verbose_name='发布状态')
     pubUser = models.ForeignKey(AdminUser, verbose_name='发布者', on_delete=models.SET_NULL, blank=True, null=True, db_index=True, related_name='pub_user')
