@@ -11,7 +11,10 @@ class LibUserSerializer(serializers.ModelSerializer):
 class NoticeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notice
-        fields = ('url', 'urlEnable', 'title', 'contents', 'type', 'publishTime', 'pubUser')
+        fields = ('url', 'urlEnable', 'title', 'contents', 'type', 'publishTime')
+
+    def get_pub_user(self, obj):
+        return obj.pubUser.username
 
 
 class UserSerializer(serializers.ModelSerializer):

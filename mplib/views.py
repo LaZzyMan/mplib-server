@@ -359,7 +359,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class NoticeViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = models.Notice.objects.filter(stats=True)
+    queryset = models.Notice.objects.filter(stats=True).order_by('-publishTime')
     serializer_class = serializers.NoticeSerializer
     filter_backends = (TypeFilter, )
 
