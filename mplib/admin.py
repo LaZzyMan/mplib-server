@@ -51,4 +51,4 @@ class NoticeAdmin(admin.ModelAdmin):
                 return
         elif obj.contents == '':
             messages.error(request, '不启用URL时，内容不能为空.')
-        super(NoticeAdmin, self).save_model(request, obj, form, change)
+        obj.save()
