@@ -39,7 +39,7 @@ class AdviseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Advise
-        fields = ('id', 'contents', 'tel', 'stats', 'solveUser', 'result', 'publishTime', 'solve_user')
+        fields = ('contents', 'tel', 'stats', 'solveTime', 'result', 'publishTime', 'solve_user')
 
     def get_solve_user(self, obj):
         return obj.solveUser.username

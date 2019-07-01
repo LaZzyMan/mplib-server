@@ -374,9 +374,8 @@ class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class AdviseViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = models.Advise.objects.filter(stats=True).order_by('-publishTime')
-    serializer_class = serializers.NoticeSerializer
-    filter_backends = (TypeFilter, )
+    queryset = models.Advise.objects.order_by('-publishTime')
+    serializer_class = serializers.AdviseSerializer
 
 
 schema_view = get_swagger_view(title='Lib Mini Program API', url=None)
