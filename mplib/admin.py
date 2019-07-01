@@ -53,7 +53,7 @@ class NoticeAdmin(admin.ModelAdmin):
         actions = super(NoticeAdmin, self).get_actions(request)
         messages.success(request, str('publish_notice' in request.user.get_all_permissions()))
         if 'mplib.publish_notice' in request.user.get_all_permissions():
-            actions.append(self.publish_notices)
+            actions.update(self.publish_notices)
         return actions
 
     def color_stats(self, obj):
