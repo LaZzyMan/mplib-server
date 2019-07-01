@@ -20,7 +20,7 @@ class NoticeSerializer(serializers.ModelSerializer):
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ('url', 'urlEnable', 'title', 'contents', 'type', 'publishTime')
+        fields = ('url', 'urlEnable', 'title', 'contents', 'publishTime')
 
     def get_pub_user(self, obj):
         return obj.pubUser.username
