@@ -64,13 +64,13 @@ class NoticeAdmin(admin.ModelAdmin):
     def publish_notices(self, request, queryset):
         queryset.update(stats=True)
 
-    publish_notices.short_description = '发布选中的公告'
+    publish_notices.short_description = '发布公告'
     publish_notices.allowed_permissions = ('publish', )
 
     def unpublish_notices(self, request, queryset):
         queryset.update(stats=False)
 
-    unpublish_notices.short_description = '撤下选中的公告'
+    unpublish_notices.short_description = '撤下公告'
     unpublish_notices.allowed_permissions = ('publish', )
 
     def has_publish_permission(self, request):
@@ -106,13 +106,13 @@ class ActivityAdmin(admin.ModelAdmin):
     def publish_activity(self, request, queryset):
         queryset.update(stats=True)
 
-    publish_activity.short_description = '发布选中的活动'
+    publish_activity.short_description = '发布活动'
     publish_activity.allowed_permissions = ('publish',)
 
     def unpublish_activity(self, request, queryset):
         queryset.update(stats=False)
 
-    unpublish_activity.short_description = '撤下选中的活动'
+    unpublish_activity.short_description = '撤下活动'
     unpublish_activity.allowed_permissions = ('publish',)
 
     def has_publish_permission(self, request):
@@ -121,7 +121,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         obj.pubUser = AdminUser.objects.get(username=request.user)
-        # obj.id = uuid.uuid1()
+        obj.id = uuid.uuid1()
         obj.stats = False
         super(ActivityAdmin, self).save_model(request, obj, form, change)
 
