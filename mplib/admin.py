@@ -154,7 +154,7 @@ class AdviseAdmin(admin.ModelAdmin):
     view_on_site = False
     list_display = ('id', 'publishTime', 'contents', 'solveUser', 'result', 'stats')
     # ordering = ('-publishTime')
-    list_filter = ('stats', 'pubUser')
+    list_filter = ('stats', 'solveUser')
     search_fields = ('contents', )
     date_hierarchy = 'publishTime'
     fields = ('publishTime', 'tel', 'contents', 'result', 'solveTime', 'stats')
