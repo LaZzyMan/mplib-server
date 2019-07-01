@@ -21,7 +21,11 @@ class NoticeForm(forms.ModelForm):
         fields = ['title', 'type', 'urlEnable', 'url', 'contents', 'publishTime']
 
     def clean(self):
-        raise ValidationError(self.cleaned_data['title'])
+        urlEnable = self.cleaned_data['urlEnable']
+        if urlEnable:
+            raise ValidationError(self.cleaned_data['url'])
+        else:
+            raise ValidationError(self.cleaned_data['contents'])
         self.super().clean()
 
 
