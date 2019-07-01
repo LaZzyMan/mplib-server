@@ -22,4 +22,4 @@ urlpatterns = [
     path('mp/admin/', admin.site.urls),
     path('mp/api-auth/', include('rest_framework.urls')),
     path('mp/api/', include('mplib.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static('/mp/upload/', document_root=settings.MEDIA_ROOT)
