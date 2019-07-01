@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['218.197.145.57', '127.0.0.1', 'localhost']
 # Application definition
 
 INSTALLED_APPS = [
+    'simpleui',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -131,5 +132,6 @@ STATIC_ROOT = '/var/www/html/'
 
 REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
+'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 }

@@ -10,6 +10,7 @@ import re
 
 URL = 'http://opac.lib.whu.edu.cn/X'
 ALPHA_URL = 'http://api.lib.whu.edu.cn/aleph-x/bor/oper'
+STAT_URL = 'http://api.lib.whu.edu.cn/aleph-x/stat/query'
 PAGE_SIZE = 20
 HEADERS = {'Cache-Control': "no-cache", 'Postman-Token': "0f969060-6547-41d2-8fca-40a13b2a0483"}
 
@@ -24,6 +25,7 @@ class XInterface(object):
         super().__init__()
         self.url = URL
         self.alpha_url = ALPHA_URL
+        self.stat_url = STAT_URL
         self.un = username
         self.pw = password
         self.headers = HEADERS
@@ -409,6 +411,27 @@ class XInterface(object):
         et = ET.fromstring(response.content.decode('utf-8'))
         items = et.findall('item-data')
 
+    def bor_visit_info(self, bor_id):
+        '''
+        入馆信息查询
+        :param bor_id:
+        :return:
+        '''
+        payload = 'BorForm%5Busername%5D=' + self.un + '&BorForm%5Bpassword%5D=' + self.alpha_psw + \
+                  '%40wx&BorForm%5Bop%5D=bor-visit-info&BorForm%5Bbor_id%5D=' + bor_id + \
+                  '&BorForm%5Bop_param%5D=&BorForm%5Bop_param2%5D=&BorForm%5Bop_param3%5D=&undefined='
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cache-control': 'no-cache',
+            'Postman-Token': 'cd46031b-12dd-4492-98ea-197c263adf6d'
+        }
+        response = requests.request("POST", self.stat_url, data=payload, headers=headers)
+        result = response.json()
+        visit_info = {}
+        for item in result:
+            visit_info[item['name']] = item['value']
+        return visit_info
+
     @staticmethod
     def z13_to_dict(et):
         return {
@@ -461,6 +484,8 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
+    xi.bor_visit_info(bor_id='2015302590030')
+    xi.loan_history_detail(bor_id='2015302590030')
     set_info = xi.find(request='东野圭吾', code='wau')
     present_info = xi.present(set_number='076131', set_entry=1, lang='cn')
     xi.item_data_nlc(doc_number='001351039')
@@ -470,7 +495,6 @@ if __name__ == '__main__':
     xi.hold_req_nlc(bor_id='ID900162486', bar_code='101102382884', pickup_loc='WL')
     xi.renew(bor_id='2016302590080', bar_code='101100356208')
     auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
-    xi.loan_history_detail(bor_id='2015302590030')
     xi.x_bor_info(bor_id='2015302590078')
     set_info = xi.find(request='高等数学')
     xi.bor_auth(uid='2015302590005', verification='180856')

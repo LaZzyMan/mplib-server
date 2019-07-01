@@ -121,6 +121,14 @@ class LibUserViewSet(viewsets.ModelViewSet):
         return Response({'status': 0, 'result': result, 'session': session})
 
     @action(methods=['get'], detail=False)
+    def visit_info(self, request):
+        session = request.query_params.get('session', '')
+        user = models.User.objects.get(session=session)
+        session = check_session(session)
+        result = self.xi.bor_visit_info(bor_id=user.libAccount.libId)
+        return Response({'status': 0, 'result': result, 'session': session})
+
+    @action(methods=['get'], detail=False)
     def hold_info(self, request):
         session = request.query_params.get('session', '')
         user = models.User.objects.get(session=session)
