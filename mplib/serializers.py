@@ -42,7 +42,10 @@ class AdviseSerializer(serializers.ModelSerializer):
         fields = ('contents', 'tel', 'stats', 'solveTime', 'result', 'publishTime', 'solve_user')
 
     def get_solve_user(self, obj):
-        return obj.solveUser.username
+        if obj.solveUser is None:
+            return None
+        else:
+            return obj.solveUser.username
 
 
 class UserSerializer(serializers.ModelSerializer):
