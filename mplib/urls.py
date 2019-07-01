@@ -7,6 +7,7 @@ router.root_view_name = 'API List'
 router.register(r'user', views.UserViewSet, base_name='user')
 router.register(r'libuser', views.LibUserViewSet, base_name='libuser')
 router.register(r'notice', views.NoticeViewSet, base_name='notice')
+router.register(r'activity', views.ActivityViewSet, base_name='activity')
 
 urlpatterns = [
     url(r'^', include(router.urls)),
