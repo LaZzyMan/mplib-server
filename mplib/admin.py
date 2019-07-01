@@ -52,9 +52,10 @@ class NoticeAdmin(admin.ModelAdmin):
     def get_actions(self, request):
         actions = super(NoticeAdmin, self).get_actions(request)
         action = actions['delete_selected']
+        messages.success(request, str(type(action)))
         messages.success(request, str('publish_notice' in request.user.get_all_permissions()))
         if 'mplib.publish_notice' in request.user.get_all_permissions():
-            actions['发布选中的公告'] = self.publish_notices
+            actions['publish_notices'] = 'publish_notices'
         del actions['delete_selected']
         actions['delete_selected'] = action
         return actions
