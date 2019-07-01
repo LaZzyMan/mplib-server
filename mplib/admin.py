@@ -43,6 +43,7 @@ class NoticeAdmin(admin.ModelAdmin):
     search_fields = ('title', 'contents')
     date_hierarchy = 'publishTime'
     fields = ('title', 'type', 'urlEnable', 'url', 'contents', 'publishTime')
+    actions = ['publish_notices']
 
     def publish_notices(self, request, queryset):
         queryset.update(stats=True)
