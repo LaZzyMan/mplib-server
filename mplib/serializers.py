@@ -20,10 +20,13 @@ class NoticeSerializer(serializers.ModelSerializer):
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ('url', 'urlEnable', 'title', 'contents', 'type', 'publishTime', 'actImg')
+        fields = ('url', 'urlEnable', 'title', 'contents', 'type', 'publishTime')
 
     def get_pub_user(self, obj):
         return obj.pubUser.username
+
+    def get_img_url(self, obj):
+        return 'https://system.lib.whu.edu.cn/mp/upload/' + obj.actImg
 
 
 class AdviseSerializer(serializers.ModelSerializer):

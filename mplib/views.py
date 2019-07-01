@@ -364,4 +364,13 @@ class NoticeViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (TypeFilter, )
 
 
+class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
+    available = models.Activity.objects.filter(stats=True).order_by('-publishTime')
+    if len(available) >= 4:
+        queryset = available[:4]
+    else:
+        queryset = models.Activity.objects.filter(stats=True).order_by('-publishTime')
+    serializer_class = serializers.ActivitySerializer
+
+
 schema_view = get_swagger_view(title='Lib Mini Program API', url=None)
