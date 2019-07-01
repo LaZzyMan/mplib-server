@@ -214,6 +214,20 @@ libuser/renew
 - session
 - status
 
+### 入馆记录
+
+libuser/visit_info
+
+#### 参数
+
+- session
+
+#### 返回
+
+- session
+- result
+- status
+
 ### 预约图书
 
 libuser/hold_req
