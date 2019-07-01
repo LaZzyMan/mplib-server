@@ -11,28 +11,28 @@ class LibUserSerializer(serializers.ModelSerializer):
 class NoticeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notice
-        fields = ('url', 'urlEnable', 'title', 'contents', 'type', 'publishTime')
+        fields = ('url', 'urlEnable', 'title', 'contents', 'type', 'publishTime', 'pubUser')
 
-    def get_pub_user(self, obj):
+    def get_pubUser(self, obj):
         return obj.pubUser.username
 
 
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ('url', 'urlEnable', 'title', 'contents', 'publishTime')
+        fields = ('url', 'urlEnable', 'title', 'contents', 'publishTime', 'pubUser', 'imgUrl')
 
-    def get_pub_user(self, obj):
+    def get_pubUser(self, obj):
         return obj.pubUser.username
 
-    def get_img_url(self, obj):
+    def get_imgUrl(self, obj):
         return 'https://system.lib.whu.edu.cn/mp/upload/' + obj.actImg
 
 
 class AdviseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advise
-        fields = ('id', 'contents', 'tel', 'stats', 'solveUser', 'result', 'publishTime')
+        fields = ('id', 'contents', 'tel', 'stats', 'solveUser', 'result', 'publishTime', 'solve_user')
 
     def get_solve_user(self, obj):
         return obj.solveUser.username
