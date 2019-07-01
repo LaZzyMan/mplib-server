@@ -85,7 +85,7 @@ class Activity(models.Model):
 
 
 class Advise(models.Model):
-    id = models.CharField(verbose_name='ID', max_length=100, primary_key=True, null=False, auto_created=True)
+    # id = models.CharField(verbose_name='ID', max_length=100, primary_key=True, null=False, auto_created=True)
     contents = models.TextField(verbose_name='投诉内容', null=True, blank=True)
     tel = models.CharField(verbose_name='联系方式', null=True, blank=True, max_length=100)
     publishTime = models.DateTimeField(verbose_name='投诉时间', null=False)
