@@ -23,9 +23,11 @@ class NoticeForm(forms.ModelForm):
     def clean(self):
         urlEnable = self.cleaned_data['urlEnable']
         if urlEnable:
-            raise ValidationError(self.cleaned_data['url'])
+            if self.cleaned_data['url'] is None:
+                raise ValidationError('使用URL时，URL不能为空')
         else:
-            raise ValidationError(self.cleaned_data['contents'])
+            if self.cleaned_data['contents'] is None:
+                raise ValidationError('请填写公告内容')
         self.super().clean()
 
 
@@ -60,13 +62,4 @@ class NoticeAdmin(admin.ModelAdmin):
         obj.pubUser = AdminUser.objects.get(username=request.user)
         obj.id = uuid.uuid1()
         obj.stats = False
-        if obj.title == '':
-            messages.error(request, '标题不能为空.')
-            return
-        if obj.urlEnable:
-            if obj.url == '':
-                messages.error(request, '启用URL时，URL不能为空.')
-                return
-        elif obj.contents == '':
-            messages.error(request, '不启用URL时，内容不能为空.')
         super(NoticeAdmin, self).save_model(request, obj, form, change)
