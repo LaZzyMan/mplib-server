@@ -373,7 +373,7 @@ class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.ActivitySerializer
 
 
-class AdviseViewSet(viewsets.ReadOnlyModelViewSet):
+class AdviseViewSet(viewsets.ModelViewSet):
     queryset = models.Advise.objects.order_by('-publishTime')
     serializer_class = serializers.AdviseSerializer
 
