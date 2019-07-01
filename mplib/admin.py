@@ -42,7 +42,7 @@ class ActivityForm(forms.ModelForm):
     def clean(self):
         urlEnable = self.cleaned_data['urlEnable']
         img = self.cleaned_data['actImg']
-        img.name = uuid.uuid1()
+        img.name = str(uuid.uuid1()) + img.name.split('.')[-1]
         if urlEnable:
             if self.cleaned_data['url'] is None:
                 raise ValidationError('使用URL时，URL不能为空')
