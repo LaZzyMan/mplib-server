@@ -137,6 +137,4 @@ REST_FRAMEWORK = {
 }
 
 SIMPLEUI_INDEX = 'http://www.lib.whu.edu.cn/web/default.asp'
-SIMPLEUI_HOME_PAGE = 'https://system.lib.whu.edu.cn/mp/admin/'
-SIMPLEUI_HOME_TITLE = '武汉大学图书馆'
-SIMPLEUI_HOME_ICON = 'book-open'
+SIMPLEUI_LOGO = 'https://avatars2.githubusercontent.com/u/13655483?s=60&v=4'
