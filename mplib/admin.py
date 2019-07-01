@@ -12,6 +12,7 @@ from django.utils.html import format_html
 admin.site.site_header = '图书馆小程序后台管理系统'
 admin.site.site_title = '武汉大学图书馆'
 admin.site.empty_value_display = '-empty-'
+admin.site.save_on_top = True
 # Register your models here.
 
 
@@ -28,7 +29,7 @@ class NoticeForm(forms.ModelForm):
         else:
             if self.cleaned_data['contents'] is None:
                 raise ValidationError('请填写公告内容')
-        self.super().clean()
+        super().clean()
 
 
 @admin.register(User)
