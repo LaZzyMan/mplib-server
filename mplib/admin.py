@@ -1,7 +1,6 @@
 from django.contrib import admin
 from mplib.models import Notice, LibUser, User, Activity, Advise
 import uuid
-import logging
 from django.contrib import messages
 from django.contrib.auth.models import User as AdminUser
 from mplib import models
@@ -36,12 +35,14 @@ class ActivityForm(forms.ModelForm):
     class Meta:
         model = models.Activity
         fields = ['title', 'urlEnable', 'url', 'contents', 'publishTime', 'actImg']
+        help_texts = {
+            'actImg': '上传图片最佳尺寸为731*295，尽量保证图片比例一致'
+        }
 
     def clean(self):
         urlEnable = self.cleaned_data['urlEnable']
         img = self.cleaned_data['actImg']
-        logging.debug(type(img))
-        print(img)
+        img.name = uuid.uuid1()
         if urlEnable:
             if self.cleaned_data['url'] is None:
                 raise ValidationError('使用URL时，URL不能为空')
