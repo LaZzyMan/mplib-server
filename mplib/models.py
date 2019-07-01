@@ -56,6 +56,7 @@ class Notice(models.Model):
     class Meta:
         verbose_name = '通知公告管理'
         verbose_name_plural = '通知公告管理'
+        permissions = (('publish_notice', 'Can publish notices'),)
 
     def __str__(self):
         return self.title

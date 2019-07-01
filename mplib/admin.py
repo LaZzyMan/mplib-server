@@ -31,13 +31,6 @@ class NoticeForm(forms.ModelForm):
         super().clean()
 
 
-def publish_notices(modeladmin, request, queryset):
-    queryset.update(stats=True)
-
-
-publish_notices.short_description = '发布选中的公告'
-
-
 @admin.register(Notice)
 class NoticeAdmin(admin.ModelAdmin):
     form = NoticeForm
@@ -50,7 +43,17 @@ class NoticeAdmin(admin.ModelAdmin):
     search_fields = ('title', 'contents')
     date_hierarchy = 'publishTime'
     fields = ('title', 'type', 'urlEnable', 'url', 'contents', 'publishTime')
-    actions = [publish_notices]
+
+    def publish_notices(self, request, queryset):
+        queryset.update(stats=True)
+
+    publish_notices.short_description = '发布选中的公告'
+
+    def get_actions(self, request):
+        actions = super(NoticeAdmin, self).get_actions(request)
+        if 'publish_notice' in request.user.get_all_permissions():
+            actions.append(self.publish_notices)
+        return actions
 
     def color_stats(self, obj):
         return obj.stats
