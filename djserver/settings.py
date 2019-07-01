@@ -132,7 +132,7 @@ STATIC_ROOT = '/var/www/html/'
 
 MEDIA_URL = '/upload/'
 
-MEDIA_ROOT = '/var/www/html/'
+MEDIA_ROOT = '/var/www/html/upload/'
 
 REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
