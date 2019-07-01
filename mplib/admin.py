@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.utils.html import format_html
 
 
-admin.site.site_header = '武汉大学图书馆小程序后台管理系统'
+admin.site.site_header = '图书馆小程序后台管理系统'
 admin.site.site_title = '武汉大学图书馆'
 # Register your models here.
 
@@ -37,6 +37,7 @@ class NoticeAdmin(admin.ModelAdmin):
     color_stats.boolean = True
 
     def save_model(self, request, obj, form, change):
+        messages.error(request, '标题不能为空.')
         obj.pub_user = request.user
         obj.id = uuid.uuid1()
         obj.stats = False
