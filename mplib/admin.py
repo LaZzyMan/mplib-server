@@ -41,7 +41,8 @@ class AdviseForm(forms.ModelForm):
 
     def clean(self):
         solve = self.cleaned_data['stats']
-
+        print(solve)
+        print(self.cleaned_data['result'])
         if solve:
             if self.cleaned_data['result'] is None:
                 raise ValidationError('请填写投诉受理结果')
