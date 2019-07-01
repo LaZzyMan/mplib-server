@@ -35,7 +35,7 @@ class NoticeForm(forms.ModelForm):
 class NoticeAdmin(admin.ModelAdmin):
     form = NoticeForm
     list_per_page = 30
-    save_on_top = True
+    # save_on_top = True
     view_on_site = False
     list_display = ('title', 'id', 'publishTime', 'pubUser', 'urlEnable', 'color_stats')
     # ordering = ('-publishTime')

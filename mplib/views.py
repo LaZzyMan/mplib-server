@@ -1,5 +1,3 @@
-from django.shortcuts import render
-from django.http import HttpResponse
 from mplib.XInterface import XInterface
 from rest_framework import filters, viewsets
 from rest_framework.response import Response
@@ -31,7 +29,7 @@ class TypeFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         type = request.query_params.get('type', None)
         if type is not None:
-            return queryset.filter(region=type)
+            return queryset.filter(type=type)
         else:
             return queryset
 
@@ -360,10 +358,10 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response({'status': 0, 'session': session})
 
 
-class NoticeViewSet(viewsets.ModelViewSet):
-    queryset = models.Notice.objects.all()
+class NoticeViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.Notice.objects.filter(stats=True)
     serializer_class = serializers.NoticeSerializer
-    filter_backends = (TimeFilter, TypeFilter, )
+    filter_backends = (TypeFilter, )
 
 
 schema_view = get_swagger_view(title='Lib Mini Program API', url=None)
