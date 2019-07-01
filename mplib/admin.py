@@ -43,13 +43,19 @@ class NoticeAdmin(admin.ModelAdmin):
     search_fields = ('title', 'contents')
     date_hierarchy = 'publishTime'
     fields = ('title', 'type', 'urlEnable', 'url', 'contents', 'publishTime')
-    actions = ['publish_notices']
+    actions = ['publish_notices', 'unpublish_notices']
 
     def publish_notices(self, request, queryset):
         queryset.update(stats=True)
 
     publish_notices.short_description = '发布选中的公告'
     publish_notices.allowed_permissions = ('publish', )
+
+    def unpublish_notices(self, request, queryset):
+        queryset.update(stats=False)
+
+    unpublish_notices.short_description = '撤下选中的公告'
+    unpublish_notices.allowed_permissions = ('publish', )
 
     def has_publish_permission(self, request):
         opts = self.opts
