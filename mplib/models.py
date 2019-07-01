@@ -89,6 +89,7 @@ class Advise(models.Model):
     contents = models.TextField(verbose_name='投诉内容', null=True, blank=True)
     tel = models.CharField(verbose_name='联系方式', null=True, blank=True, max_length=100)
     publishTime = models.DateTimeField(verbose_name='投诉时间', null=False)
+    solveTime = models.DateTimeField(verbose_name='受理时间', null=False)
     stats = models.BooleanField(verbose_name='受理状态')
     solveUser = models.ForeignKey(AdminUser, verbose_name='受理者', on_delete=models.SET_NULL, blank=True, null=True,
                                   db_index=True, related_name='solve_user')
@@ -97,6 +98,7 @@ class Advise(models.Model):
     class Meta:
         verbose_name = '投诉受理'
         verbose_name_plural = '投诉受理'
+        permissions = (('solve_advise', 'Can solve advise'),)
 
     def __str__(self):
         return self.id

@@ -31,6 +31,21 @@ class NoticeForm(forms.ModelForm):
         super().clean()
 
 
+class AdviseForm(forms.ModelForm):
+    class Meta:
+        model = models.Advise
+        fields = ['publishTime', 'tel', 'contents', 'result', 'solveTime', 'stats']
+
+    def clean(self):
+        solve = self.cleaned_data['stats']
+        if solve:
+            if self.cleaned_data['result'] is None:
+                raise ValidationError('请填写投诉受理结果')
+            if self.cleaned_data['solveTime'] is None:
+                raise ValidationError('请填写投诉受理时间')
+        super().clean()
+
+
 class ActivityForm(forms.ModelForm):
     class Meta:
         model = models.Activity
@@ -42,7 +57,7 @@ class ActivityForm(forms.ModelForm):
     def clean(self):
         urlEnable = self.cleaned_data['urlEnable']
         img = self.cleaned_data['actImg']
-        img.name = str(uuid.uuid1()) + img.name.split('.')[-1]
+        img.name = str(uuid.uuid1()) + '.' + img.name.split('.')[-1]
         if urlEnable:
             if self.cleaned_data['url'] is None:
                 raise ValidationError('使用URL时，URL不能为空')
@@ -133,7 +148,27 @@ class ActivityAdmin(admin.ModelAdmin):
 
 @admin.register(Advise)
 class AdviseAdmin(admin.ModelAdmin):
-    pass
+    form = AdviseForm
+    list_per_page = 30
+    # save_on_top = True
+    view_on_site = False
+    list_display = ('id', 'publishTime', 'contents', 'solveUser', 'result', 'stats')
+    # ordering = ('-publishTime')
+    list_filter = ('stats', 'pubUser')
+    search_fields = ('contents', )
+    date_hierarchy = 'publishTime'
+    fields = ('publishTime', 'tel', 'contents', 'result', 'solveTime', 'stats')
+
+    def get_readonly_fields(self, request, obj=None):
+        opts = self.opts
+        if request.user.has_perm('%s.%s' % (opts.app_label, 'solve_advise')):
+            return ('publishTime', 'tel', 'contents')
+        else:
+            return ('publishTime', 'tel', 'contents', 'result', 'solveTime', 'stats')
+
+    def save_model(self, request, obj, form, change):
+        obj.solveUser = AdminUser.objects.get(username=request.user)
+        super(AdviseAdmin, self).save_model(request, obj, form, change)
 
 
 @admin.register(User)
