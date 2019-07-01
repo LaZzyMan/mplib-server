@@ -12,7 +12,6 @@ from django.utils.html import format_html
 admin.site.site_header = '图书馆小程序后台管理系统'
 admin.site.site_title = '武汉大学图书馆'
 admin.site.empty_value_display = '-empty-'
-admin.site.save_on_top = True
 # Register your models here.
 
 
@@ -32,27 +31,26 @@ class NoticeForm(forms.ModelForm):
         super().clean()
 
 
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    pass
+def publish_notices(modeladmin, request, queryset):
+    queryset.update(stats=True)
 
 
-@admin.register(LibUser)
-class LibUserAdmin(admin.ModelAdmin):
-    pass
+publish_notices.short_description = '发布选中的公告'
 
 
 @admin.register(Notice)
 class NoticeAdmin(admin.ModelAdmin):
     form = NoticeForm
     list_per_page = 30
+    save_on_top = True
     view_on_site = False
-    list_display = ('id', 'title', 'publishTime', 'pubUser', 'urlEnable', 'color_stats')
+    list_display = ('title', 'id', 'publishTime', 'pubUser', 'urlEnable', 'color_stats')
     # ordering = ('-publishTime')
     list_filter = ('type', 'urlEnable', 'stats', 'pubUser')
     search_fields = ('title', 'contents')
     date_hierarchy = 'publishTime'
     fields = ('title', 'type', 'urlEnable', 'url', 'contents', 'publishTime')
+    actions = [publish_notices]
 
     def color_stats(self, obj):
         return obj.stats
@@ -64,3 +62,13 @@ class NoticeAdmin(admin.ModelAdmin):
         obj.id = uuid.uuid1()
         obj.stats = False
         super(NoticeAdmin, self).save_model(request, obj, form, change)
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(LibUser)
+class LibUserAdmin(admin.ModelAdmin):
+    pass
