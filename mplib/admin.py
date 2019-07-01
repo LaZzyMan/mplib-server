@@ -39,6 +39,7 @@ class NoticeAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         obj.pub_user = AdminUser.objects.get(username=request.user)
+        messages.error(request, obj.pub_user.username)
         obj.id = uuid.uuid1()
         obj.stats = False
         if obj.title == '':
@@ -50,5 +51,4 @@ class NoticeAdmin(admin.ModelAdmin):
                 return
         elif obj.contents == '':
             messages.error(request, '不启用URL时，内容不能为空.')
-        messages.success(request, '保存成功.')
         super(NoticeAdmin, self).save_model(request, obj, form, change)
