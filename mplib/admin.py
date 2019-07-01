@@ -1,5 +1,5 @@
 from django.contrib import admin
-from mplib.models import Notice, LibUser, User
+from mplib.models import Notice, LibUser, User, Activity, Advise
 import uuid
 from django.contrib import messages
 from django.contrib.auth.models import User as AdminUser
@@ -71,6 +71,16 @@ class NoticeAdmin(admin.ModelAdmin):
         obj.id = uuid.uuid1()
         obj.stats = False
         super(NoticeAdmin, self).save_model(request, obj, form, change)
+
+
+@admin.register(Activity)
+class ActivityAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Advise)
+class AdviseAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(User)

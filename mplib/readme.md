@@ -258,3 +258,53 @@ libuser/hold_req_cancel
 
 - session
 - status
+
+## 通知公告
+
+### 通知查询
+
+/notice
+
+#### 参数
+
+- type: N(通知), Z(资源动态), P(培训活动)
+
+#### 返回
+
+- count
+- next
+- previous
+- results
+
+### 活动查询
+
+/activity
+
+#### 返回
+
+- count
+- next
+- previous
+- results
+
+### 投诉查询
+
+/advise
+
+#### 返回
+
+- count
+- next
+- previous
+- results
+
+### 投诉上传（post）
+
+/advise
+
+#### 返回
+
+- count
+- next
+- previous
+- results

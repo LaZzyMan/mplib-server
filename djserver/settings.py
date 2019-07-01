@@ -130,6 +130,10 @@ STATIC_URL = '/mp-static/'
 
 STATIC_ROOT = '/var/www/html/'
 
+MEDIA_URL = '/upload/'
+
+MEDIA_ROOT = '/var/www/html/'
+
 REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
