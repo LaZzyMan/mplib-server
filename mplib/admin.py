@@ -31,6 +31,22 @@ class NoticeForm(forms.ModelForm):
         super().clean()
 
 
+class ActivityForm(forms.ModelForm):
+    class Meta:
+        model = models.Notice
+        fields = ['title', 'urlEnable', 'url', 'contents', 'publishTime', 'actImg']
+
+    def clean(self):
+        urlEnable = self.cleaned_data['urlEnable']
+        if urlEnable:
+            if self.cleaned_data['url'] is None:
+                raise ValidationError('使用URL时，URL不能为空')
+        else:
+            if self.cleaned_data['contents'] is None:
+                raise ValidationError('请填写公告内容')
+        super().clean()
+
+
 @admin.register(Notice)
 class NoticeAdmin(admin.ModelAdmin):
     form = NoticeForm
@@ -75,7 +91,39 @@ class NoticeAdmin(admin.ModelAdmin):
 
 @admin.register(Activity)
 class ActivityAdmin(admin.ModelAdmin):
-    pass
+    form = ActivityForm
+    list_per_page = 30
+    # save_on_top = True
+    view_on_site = False
+    list_display = ('title', 'id', 'publishTime', 'pubUser', 'urlEnable', 'stats')
+    # ordering = ('-publishTime')
+    list_filter = ('urlEnable', 'stats', 'pubUser')
+    search_fields = ('title', 'contents')
+    date_hierarchy = 'publishTime'
+    fields = ('title', 'urlEnable', 'url', 'contents', 'publishTime', 'actImg')
+    actions = ['publish_activity', 'unpublish_activity']
+
+    def publish_activity(self, request, queryset):
+        queryset.update(stats=True)
+
+    publish_activity.short_description = '发布选中的活动'
+    publish_activity.allowed_permissions = ('publish',)
+
+    def unpublish_activity(self, request, queryset):
+        queryset.update(stats=False)
+
+    unpublish_activity.short_description = '撤下选中的活动'
+    unpublish_activity.allowed_permissions = ('publish',)
+
+    def has_publish_permission(self, request):
+        opts = self.opts
+        return request.user.has_perm('%s.%s' % (opts.app_label, 'publish_activity'))
+
+    def save_model(self, request, obj, form, change):
+        obj.pubUser = AdminUser.objects.get(username=request.user)
+        # obj.id = uuid.uuid1()
+        obj.stats = False
+        super(ActivityAdmin, self).save_model(request, obj, form, change)
 
 
 @admin.register(Advise)
