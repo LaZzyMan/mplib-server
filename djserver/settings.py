@@ -130,7 +130,7 @@ STATIC_URL = '/mp-static/'
 
 STATIC_ROOT = '/var/www/html/'
 
-MEDIA_URL = '/upload/'
+MEDIA_URL = '/mp/upload/'
 
 MEDIA_ROOT = '/var/www/html/upload/'
 
