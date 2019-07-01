@@ -39,7 +39,7 @@ class AdviseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Advise
-        fields = ('contents', 'tel', 'stats', 'solveTime', 'result', 'publishTime', 'solve_user')
+        fields = ('id', 'contents', 'tel', 'stats', 'solveTime', 'result', 'publishTime', 'solve_user')
 
     def get_solve_user(self, obj):
         if obj.solveUser is None:

@@ -302,6 +302,15 @@ libuser/hold_req_cancel
 
 /advise
 
+#### 参数实例
+```json
+{
+    "tel": "18642160183",
+    "contents": "hhhhhh",
+    "publishTime": "2019-07-01 21:34:00"
+}
+```
+
 #### 返回
 
 - count

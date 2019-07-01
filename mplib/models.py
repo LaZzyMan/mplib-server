@@ -101,7 +101,7 @@ class Advise(models.Model):
         permissions = (('solve_advise', 'Can solve advise'),)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 
 

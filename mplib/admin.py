@@ -35,6 +35,9 @@ class AdviseForm(forms.ModelForm):
     class Meta:
         model = models.Advise
         fields = ['publishTime', 'tel', 'contents', 'result', 'solveTime', 'stats']
+        help_texts = {
+            'stats': '填写受理结果和时间后完成受理'
+        }
 
     def clean(self):
         solve = self.cleaned_data['stats']
