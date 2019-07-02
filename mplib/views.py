@@ -58,7 +58,7 @@ class SessionFilter(filters.BaseFilterBackend):
             return queryset
 
 
-class LibUserViewSet(viewsets.ModelViewSet):
+class LibUserViewSet(viewsets.ReadOnlyModelViewSet):
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
     queryset = models.LibUser.objects.all()
     serializer_class = serializers.LibUserSerializer
@@ -258,13 +258,13 @@ class LibUserViewSet(viewsets.ModelViewSet):
         return Response(self.xi.session)
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.User.objects.all()
     serializer_class = serializers.UserSerializer
     filter_backends = (SessionFilter,)
 
-    @silk_profile(name='Verify Session')
     @action(methods=['get'], detail=False)
+    @silk_profile(name='Verify Session')
     def vertify_session(self, request):
         try:
             user = models.User.objects.get(session=request.query_params.get('session', ''))
@@ -277,8 +277,8 @@ class UserViewSet(viewsets.ModelViewSet):
         except:
             return Response({'login': False, 'libBind': False})
 
-    @silk_profile(name='Update Session')
     @action(methods=['get'], detail=False)
+    @silk_profile(name='Update Session')
     def update_session(self, request):
         url = 'https://api.weixin.qq.com/sns/jscode2session'
         querystring = {'appid': 'wx8ae3e8607ee301fd',
@@ -301,8 +301,8 @@ class UserViewSet(viewsets.ModelViewSet):
             session = check_session(user.session)
             return Response({'status': 1, 'session': session})
 
-    @silk_profile(name='WeChat Login')
     @action(methods=['get'], detail=False)
+    @silk_profile(name='WeChat Login')
     def login(self, request):
         url = 'https://api.weixin.qq.com/sns/jscode2session'
         querystring = {'appid': 'wx8ae3e8607ee301fd',
@@ -345,8 +345,8 @@ class UserViewSet(viewsets.ModelViewSet):
             user.save()
             return Response({'session': user.session, 'libBind': False})
 
-    @silk_profile(name='Bind Library Account')
     @action(methods=['get'], detail=False)
+    @silk_profile(name='Bind Library Account')
     def bind_lib(self, request):
         try:
             user = models.User.objects.get(session=request.query_params.get('session', ''))
