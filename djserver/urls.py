@@ -20,6 +20,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('mp/admin/', admin.site.urls),
+    path('mp/accounts/', admin.site.urls),
     path('mp/api-auth/', include('rest_framework.urls')),
     path('mp/api/', include('mplib.urls')),
     path('mp/silk', include('silk.urls', namespace='silk'))
