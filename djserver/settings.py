@@ -146,9 +146,9 @@ SIMPLEUI_INDEX = 'http://www.lib.whu.edu.cn/web/default.asp'
 SIMPLEUI_LOGO = 'https://avatars2.githubusercontent.com/u/13655483?s=60&v=4'
 SIMPLEUI_HOME_INFO = False
 
-SILK_PYTHON_PROFILER = True
-SILK_PYTHON_PROFILER_BINARY = True
-SILK_PYTHON_PROFILER_RESULT_PATH = '/log/profiles/'
+SILKY_PYTHON_PROFILER = True
+SILKY_PYTHON_PROFILER_BINARY = True
+SILKY_PYTHON_PROFILER_RESULT_PATH = '/log/profiles/'
 SILKY_AUTHENTICATION = True
 SILKY_AUTHORISATION = True
 SILKY_PERMISSIONS = lambda user: user.is_superuser
