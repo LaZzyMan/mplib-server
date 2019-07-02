@@ -97,6 +97,48 @@ libuser/login
 - status
 - user
 
+### 查询图书馆用户信息
+
+libuser/bor_info
+
+#### 参数
+
+- session
+
+#### 返回
+
+- session
+- result
+- status
+
+### 更新用户邮箱
+
+libuser/update_email
+
+#### 参数
+
+- session
+- email
+
+#### 返回
+
+- session
+- status
+
+### 更新用户电话
+
+libuser/update_telephone
+
+#### 参数
+
+- session
+- tel
+
+#### 返回
+
+- session
+- status
+
 ## 馆藏查询
 
 libuser/find
