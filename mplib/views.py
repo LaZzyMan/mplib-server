@@ -265,41 +265,39 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(methods=['get'], detail=False)
     def vertify_session(self, request):
-        with silk_profile(name='Verify Session'):
-            try:
-                user = models.User.objects.get(session=request.query_params.get('session', ''))
-                if user.libAccount is None:
-                    session = check_session(user.session)
-                    return Response({'login': True, 'libBind': False, 'session': session})
-                else:
-                    session = check_session(user.session)
-                    return Response({'login': True, 'libBind': True, 'session': session})
-            except:
-                return Response({'login': False, 'libBind': False})
+        try:
+            user = models.User.objects.get(session=request.query_params.get('session', ''))
+            if user.libAccount is None:
+                session = check_session(user.session)
+                return Response({'login': True, 'libBind': False, 'session': session})
+            else:
+                session = check_session(user.session)
+                return Response({'login': True, 'libBind': True, 'session': session})
+        except:
+            return Response({'login': False, 'libBind': False})
 
     @action(methods=['get'], detail=False)
     def update_session(self, request):
-        with silk_profile(name='Update Session'):
-            url = 'https://api.weixin.qq.com/sns/jscode2session'
-            querystring = {'appid': 'wx8ae3e8607ee301fd',
-                           'js_code': request.query_params.get('code', ''),
-                           'secret': 'df249bf353c20060748c5e40a334ad62',
-                           'grant_type': 'authorization_code'}
-            headers = {
-                'cache-control': "no-cache",
-                'Postman-Token': "9a482037-e9e8-4b53-9863-3cd0f7864b01"
-            }
-            response = requests.request("GET", url, data='', headers=headers, params=querystring)
-            result = response.json()
-            user = models.User.objects.get(session=request.query_params.get('session', ''))
-            if result['errorcode'] == 0:
-                user.wxSessionKey = result['session_key']
-                user.save()
-                session = check_session(user.session)
-                return Response({'status': 0, 'session': session})
-            else:
-                session = check_session(user.session)
-                return Response({'status': 1, 'session': session})
+        url = 'https://api.weixin.qq.com/sns/jscode2session'
+        querystring = {'appid': 'wx8ae3e8607ee301fd',
+                       'js_code': request.query_params.get('code', ''),
+                       'secret': 'df249bf353c20060748c5e40a334ad62',
+                       'grant_type': 'authorization_code'}
+        headers = {
+            'cache-control': "no-cache",
+            'Postman-Token': "9a482037-e9e8-4b53-9863-3cd0f7864b01"
+        }
+        response = requests.request("GET", url, data='', headers=headers, params=querystring)
+        result = response.json()
+        user = models.User.objects.get(session=request.query_params.get('session', ''))
+        if result['errorcode'] == 0:
+            user.wxSessionKey = result['session_key']
+            user.save()
+            session = check_session(user.session)
+            return Response({'status': 0, 'session': session})
+        else:
+            session = check_session(user.session)
+            return Response({'status': 1, 'session': session})
 
     @action(methods=['get'], detail=False)
     def login(self, request):
