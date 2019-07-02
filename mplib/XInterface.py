@@ -127,9 +127,20 @@ class XInterface(object):
             loan_list.append({'loan_info': self.z36_to_dict(loan.find('z36')),
                               'book_info': self.z13_to_dict(loan.find('z13')),
                               'bar_code': loan.find('./z30/z30-barcode').text})
+        bor_info = {
+            'name': et.find('./z303/z303-name').text,
+            'birthday': et.find('./z303/z303-birth-date').text,
+            'gender': et.find('./z303/z303-gender').text,
+            'department': et.find('./z304/z304-address-1').text,
+            'prof': et.find('./z304/z304-address-2').text,
+            'email': et.find('./z304/z304-email-address').text,
+            'telephone': et.find('./z304/z304-telephone').text,
+            'type': et.find('./z305/z305-bor-type').text
+        }
         return {
             'loan': loan_list,
-            'hold': hold_list
+            'hold': hold_list,
+            'bor-info': bor_info
         }
 
     def find(self, request='', code='wrd', lang='cn'):
@@ -432,6 +443,54 @@ class XInterface(object):
             visit_info[item['name']] = item['value']
         return visit_info
 
+    def update_email(self, bor_id, email):
+        '''
+        更新用户邮箱
+        :param bor_id:
+        :param email:
+        :return:
+        '''
+        payload = 'BorForm%5Busername%5D=' + self.un + '&BorForm%5Bpassword%5D=' + self.alpha_psw + \
+                  '%40wx&BorForm%5Bop%5D=update-bor-email&BorForm%5Bbor_id%5D=' + bor_id + \
+                  '&BorForm%5Bop_param%5D=' + email + '&BorForm%5Bop_param2%5D=&BorForm%5Bop_param3%5D=&undefined='
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cache-control': 'no-cache',
+            'Postman-Token': 'cd46031b-12dd-4492-98ea-197c263adf6d'
+        }
+        response = requests.request("POST", self.alpha_url, data=payload, headers=headers)
+        result = {}
+        for item in response.json():
+            result[item['name']] = item['value']
+        if result['error'] == 'ok':
+            return {'result': 0}
+        else:
+            return {'result': 1}
+
+    def update_telephone(self, bor_id, tel):
+        '''
+        更新用户电话
+        :param bor_id:
+        :param tel:
+        :return:
+        '''
+        payload = 'BorForm%5Busername%5D=' + self.un + '&BorForm%5Bpassword%5D=' + self.alpha_psw + \
+                  '%40wx&BorForm%5Bop%5D=update-bor-telephone&BorForm%5Bbor_id%5D=' + bor_id + \
+                  '&BorForm%5Bop_param%5D=' + tel + '&BorForm%5Bop_param2%5D=&BorForm%5Bop_param3%5D=&undefined='
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'cache-control': 'no-cache',
+            'Postman-Token': 'cd46031b-12dd-4492-98ea-197c263adf6d'
+        }
+        response = requests.request("POST", self.alpha_url, data=payload, headers=headers)
+        result = {}
+        for item in response.json():
+            result[item['name']] = item['value']
+        if result['error'] == 'ok':
+            return {'result': 0}
+        else:
+            return {'result': 1}
+
     @staticmethod
     def z13_to_dict(et):
         return {
@@ -484,19 +543,20 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
-    xi.bor_visit_info(bor_id='2015302590030')
+    xi.update_email('2016302590080', 'gaoyanxilin@163.com')
+    xi.update_telephone('2016302590080', '15629099660')
+    xi.bor_info(uid='2016302590080')
+    xi.bor_visit_info(bor_id='2016302590080')
     xi.loan_history_detail(bor_id='2015302590030')
     set_info = xi.find(request='东野圭吾', code='wau')
     present_info = xi.present(set_number='076131', set_entry=1, lang='cn')
     xi.item_data_nlc(doc_number='001351039')
     # xi.circ_status(sys_no='001350497')
     xi.bor_rank()
-    xi.bor_info(uid='2017302590216')
     xi.hold_req_nlc(bor_id='ID900162486', bar_code='101102382884', pickup_loc='WL')
     xi.renew(bor_id='2016302590080', bar_code='101100356208')
     auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
     xi.x_bor_info(bor_id='2015302590078')
     set_info = xi.find(request='高等数学')
     xi.bor_auth(uid='2015302590005', verification='180856')
-
 

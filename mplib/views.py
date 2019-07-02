@@ -103,6 +103,14 @@ class LibUserViewSet(viewsets.ModelViewSet):
                 return Response({'status': 0, 'user': {'name': lu.name, 'bor_id': lu.libId, 'department': lu.department, 'reader_type': lu.readerType}, 'session': session})
 
     @action(methods=['get'], detail=False)
+    def bor_info(self, request):
+        session = request.query_params.get('session', '')
+        user = models.User.objects.get(session=session)
+        session = check_session(session)
+        result = self.xi.bor_info(uid=user.libAccount.libId)
+        return Response({'status': 0, 'result': result['bor-info'], 'session': session})
+
+    @action(methods=['get'], detail=False)
     def borrow_info(self, request):
         session = request.query_params.get('session', '')
         user = models.User.objects.get(session=session)
@@ -216,32 +224,28 @@ class LibUserViewSet(viewsets.ModelViewSet):
         return Response({'status': 0, 'session': session, 'result': result})
 
     @action(methods=['get'], detail=False)
-    def notice(self, request):
-        search = []
-        for i in range(20):
-            search.append({
-                "title": "通知公告",
-                "volume": 100,
-                "time": "2019-03-26",
-                "type": 0
-            })
-        for i in range(20):
-            search.append({
-                "title": "通知公告",
-                "volume": 100,
-                "time": "2019-03-26",
-                "type": 1
-            })
-        for i in range(20):
-            search.append({
-                "title": "通知公告",
-                "volume": 100,
-                "time": "2019-03-26",
-                "type": 2
-            })
-        if len(search) > 30:
-            search = search[:30]
-        return Response(search)
+    def update_email(self, request):
+        session = request.query_params.get('session', '')
+        email = request.query_params.get('email', '')
+        user = models.User.objects.get(session=session)
+        session = check_session(session)
+        result = self.xi.update_email(bor_id=user.libAccount.libId, email=email)
+        if result['result'] == 0:
+            return Response({'status': 0, 'session': session})
+        else:
+            return Response({'status': 1, 'session': session})
+
+    @action(methods=['get'], detail=False)
+    def update_telephone(self, request):
+        session = request.query_params.get('session', '')
+        tel = request.query_params.get('tel', '')
+        user = models.User.objects.get(session=session)
+        session = check_session(session)
+        result = self.xi.update_telephone(bor_id=user.libAccount.libId, tel=tel)
+        if result['result'] == 0:
+            return Response({'status': 0, 'session': session})
+        else:
+            return Response({'status': 1, 'session': session})
 
     @action(methods=['get'], detail=False)
     def watch(self, request):
