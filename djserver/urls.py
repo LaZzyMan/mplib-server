@@ -22,4 +22,5 @@ urlpatterns = [
     path('mp/admin/', admin.site.urls),
     path('mp/api-auth/', include('rest_framework.urls')),
     path('mp/api/', include('mplib.urls')),
+    path('mp/silk', include('silk.urls', namespace='silk'))
 ] + static('/mp/upload/', document_root=settings.MEDIA_ROOT)

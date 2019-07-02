@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'mplib.apps.MplibConfig',
     'rest_framework',
     'rest_framework_swagger',
+    'silk',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'silk.middleware.SilkyMiddleware',
 ]
 
 ROOT_URLCONF = 'djserver.urls'
