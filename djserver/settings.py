@@ -151,7 +151,12 @@ SILKY_PYTHON_PROFILER_BINARY = True
 SILKY_PYTHON_PROFILER_RESULT_PATH = '/log/profiles/'
 SILKY_AUTHENTICATION = True
 SILKY_AUTHORISATION = True
-SILKY_PERMISSIONS = lambda user: user.is_superuser
+# SILKY_PERMISSIONS = lambda user: user.is_superuser
+
+SILKY_DYNAMIC_PROFILING = [{
+    'module': 'mplib.views',
+    'function': 'UserViewSet.unbind_lib'
+}]
 
 
 
