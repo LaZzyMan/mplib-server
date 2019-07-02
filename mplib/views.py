@@ -14,6 +14,7 @@ from Crypto.Cipher import PKCS1_v1_5
 import base64
 from mplib.encryption import PRIVATE_KEY
 from django.contrib.auth.hashers import make_password, check_password
+from silk.profiling.profiler import silk_profile
 
 
 class TimeFilter(filters.BaseFilterBackend):
@@ -262,6 +263,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.UserSerializer
     filter_backends = (SessionFilter,)
 
+    @silk_profile(name='Verify Session')
     @action(methods=['get'], detail=False)
     def vertify_session(self, request):
         try:
@@ -275,6 +277,7 @@ class UserViewSet(viewsets.ModelViewSet):
         except:
             return Response({'login': False, 'libBind': False})
 
+    @silk_profile(name='Update Session')
     @action(methods=['get'], detail=False)
     def update_session(self, request):
         url = 'https://api.weixin.qq.com/sns/jscode2session'
@@ -298,6 +301,7 @@ class UserViewSet(viewsets.ModelViewSet):
             session = check_session(user.session)
             return Response({'status': 1, 'session': session})
 
+    @silk_profile(name='WeChat Login')
     @action(methods=['get'], detail=False)
     def login(self, request):
         url = 'https://api.weixin.qq.com/sns/jscode2session'
@@ -341,6 +345,7 @@ class UserViewSet(viewsets.ModelViewSet):
             user.save()
             return Response({'session': user.session, 'libBind': False})
 
+    @silk_profile(name='Bind Library Account')
     @action(methods=['get'], detail=False)
     def bind_lib(self, request):
         try:
@@ -353,6 +358,7 @@ class UserViewSet(viewsets.ModelViewSet):
         except:
             return Response({'status': 1})
 
+    @silk_profile(name='Unbind Library Account')
     @action(methods=['get'], detail=False)
     def unbind_lib(self, request):
         user = models.User.objects.get(session=request.query_params.get('session', ''))
