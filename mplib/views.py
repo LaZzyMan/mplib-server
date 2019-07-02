@@ -358,8 +358,8 @@ class UserViewSet(viewsets.ModelViewSet):
         except:
             return Response({'status': 1})
 
-    @silk_profile(name='Unbind Library Account')
     @action(methods=['get'], detail=False)
+    @silk_profile(name='Unbind Library Account')
     def unbind_lib(self, request):
         user = models.User.objects.get(session=request.query_params.get('session', ''))
         user.libAccount = None
