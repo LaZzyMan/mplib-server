@@ -15,6 +15,7 @@ import base64
 from mplib.encryption import PRIVATE_KEY
 from django.contrib.auth.hashers import make_password, check_password
 from silk.profiling.profiler import silk_profile
+from mplib.error import trouble_shooter
 
 
 class TimeFilter(filters.BaseFilterBackend):
@@ -263,18 +264,22 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.UserSerializer
     filter_backends = (SessionFilter,)
 
+    def list(self, request, *args, **kwargs):
+        return Response('Unsupported Method')
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response('Unsupported Method')
+
     @action(methods=['get'], detail=False)
+    @trouble_shooter
     def vertify_session(self, request):
-        try:
-            user = models.User.objects.get(session=request.query_params.get('session', ''))
-            if user.libAccount is None:
-                session = check_session(user.session)
-                return Response({'login': True, 'libBind': False, 'session': session})
-            else:
-                session = check_session(user.session)
-                return Response({'login': True, 'libBind': True, 'session': session})
-        except:
-            return Response({'login': False, 'libBind': False})
+        user = models.User.objects.get(session=request.query_params.get('session', ''))
+        if user.libAccount is None:
+            session = check_session(user.session)
+            return Response({'login': True, 'libBind': False, 'session': session})
+        else:
+            session = check_session(user.session)
+            return Response({'login': True, 'libBind': True, 'session': session})
 
     @action(methods=['get'], detail=False)
     def update_session(self, request):
