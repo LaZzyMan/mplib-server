@@ -153,8 +153,8 @@ SILKY_AUTHENTICATION = True
 SILKY_AUTHORISATION = True
 SILKY_PERMISSIONS = lambda user: user.is_superuser
 
-LOGIN_REDIRECT_URL = '/mp/account/login'
-LOGIN_URL = '/mp/account/login'
+LOGIN_REDIRECT_URL = '/mp/accounts/login'
+LOGIN_URL = '/mp/accounts/login'
 
 
 
