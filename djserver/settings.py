@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'cw!obl7x7q(j=+n0m+e1t&m%3)m_y$se#u82ldfabt)ms0h+=m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['http://system.lib.whu.edu.cn/', '218.197.145.57', '127.0.0.1', 'localhost']
 
@@ -132,7 +132,7 @@ STATIC_URL = '/mp-static/'
 
 STATIC_ROOT = '/var/www/html/mp-static/'
 
-MEDIA_URL = '/mp/mp-static/upload/'
+MEDIA_URL = '/mp-static/upload/'
 
 MEDIA_ROOT = '/var/www/html/mp-static/upload/'
 
