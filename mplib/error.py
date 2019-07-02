@@ -17,6 +17,6 @@ def trouble_shooter(func):
     def wrapper(*args, **kwargs):
         try:
             func(*args, **kwargs)
-        except exceptions.ObjectDoesNotExist as e:
-            return Response({'status': 1, 'err_msg': e})
+        except exceptions.ObjectDoesNotExist as _:
+            return Response({'status': 1, 'err_msg': 'LOGIN_FAILED'})
     return wrapper

@@ -64,6 +64,12 @@ class LibUserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.LibUser.objects.all()
     serializer_class = serializers.LibUserSerializer
 
+    def list(self, request, *args, **kwargs):
+        return Response('Unsupported Method')
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response('Unsupported Method')
+
     @action(methods=['get'], detail=False)
     def update_session(self, request):
         self.xi.session = self.xi.login()
