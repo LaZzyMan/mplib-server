@@ -264,7 +264,6 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (SessionFilter,)
 
     @action(methods=['get'], detail=False)
-    @silk_profile(name='Verify Session')
     def vertify_session(self, request):
         try:
             user = models.User.objects.get(session=request.query_params.get('session', ''))
@@ -278,7 +277,6 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({'login': False, 'libBind': False})
 
     @action(methods=['get'], detail=False)
-    @silk_profile(name='Update Session')
     def update_session(self, request):
         url = 'https://api.weixin.qq.com/sns/jscode2session'
         querystring = {'appid': 'wx8ae3e8607ee301fd',
@@ -302,7 +300,6 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({'status': 1, 'session': session})
 
     @action(methods=['get'], detail=False)
-    @silk_profile(name='WeChat Login')
     def login(self, request):
         url = 'https://api.weixin.qq.com/sns/jscode2session'
         querystring = {'appid': 'wx8ae3e8607ee301fd',
@@ -346,7 +343,6 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({'session': user.session, 'libBind': False})
 
     @action(methods=['get'], detail=False)
-    @silk_profile(name='Bind Library Account')
     def bind_lib(self, request):
         try:
             user = models.User.objects.get(session=request.query_params.get('session', ''))
@@ -359,7 +355,6 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({'status': 1})
 
     @action(methods=['get'], detail=False)
-    @silk_profile(name='Unbind Library Account')
     def unbind_lib(self, request):
         user = models.User.objects.get(session=request.query_params.get('session', ''))
         user.libAccount = None
