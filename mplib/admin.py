@@ -178,11 +178,20 @@ class AdviseAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     list_per_page = 30
     view_on_site = False
-    list_display = ('nickName', 'libAccount', 'gender', 'country', 'province', 'city', 'lastLoginTime')
+    list_display = ('nickName', 'libAccount', 'gender_name', 'country', 'province', 'city', 'lastLoginTime')
     list_filter = ('gender', 'province', 'city')
     search_fields = ('nickName', )
     date_hierarchy = 'lastLoginTime'
     fields = ('nickName', 'libAccount', 'gender', 'country', 'province', 'city', 'avatarUrl', 'lastLoginTime')
+
+    def gender_name(self, obj):
+        if obj.gender == 2:
+            return '女'
+        elif obj.gender == 1:
+            return '男'
+        else:
+            return '未知'
+    gender_name.short_description = '性别'
 
 
 @admin.register(LibUser)

@@ -62,7 +62,7 @@ def check_session(session):
 
 def check_param(params, request):
     for param in params:
-        p = request.query_params(param)
+        p = request.query_params.get(param)
         if p is None:
             raise ParamMissException(param)
 

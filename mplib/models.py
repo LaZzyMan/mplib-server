@@ -18,6 +18,9 @@ class LibUser(models.Model):
         verbose_name = '图书馆用户管理'
         verbose_name_plural = '图书馆用户管理'
 
+    def __str__(self):
+        return self.libId
+
 
 class User(models.Model):
     openId = models.CharField(verbose_name='open id', max_length=100, null=True)
