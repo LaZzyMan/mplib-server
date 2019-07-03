@@ -280,7 +280,10 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     @action(methods=['get'], detail=False)
     @trouble_shooter
     def vertify_session(self, request):
-        user = models.User.objects.get(session=request.query_params.get('session'))
+        session = request.query_params.get('session', '')
+        if session is None:
+            raise ParamMissException(err='session')
+        user = models.User.objects.get(session=session)
         if user.libAccount is None:
             session = check_session(user.session)
             return Response({'status': 0, 'login': True, 'libBind': False, 'session': session})
@@ -291,6 +294,9 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     @action(methods=['get'], detail=False)
     @trouble_shooter
     def update_session(self, request):
+        session = request.query_params.get('session', '')
+        if session is None:
+            raise ParamMissException(err='session')
         url = 'https://api.weixin.qq.com/sns/jscode2session'
         querystring = {'appid': 'wx8ae3e8607ee301fd',
                        'js_code': request.query_params.get('code', ''),
@@ -302,7 +308,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         }
         response = requests.request("GET", url, data='', headers=headers, params=querystring)
         result = response.json()
-        user = models.User.objects.get(session=request.query_params.get('session', ''))
+        user = models.User.objects.get(session=session)
         if 'errcode' not in result:
             user.wxSessionKey = result['session_key']
             user.save()

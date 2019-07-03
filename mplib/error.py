@@ -44,9 +44,9 @@ def trouble_shooter(func):
         except exceptions.ObjectDoesNotExist as _:
             return Response({'status': 1, 'err_msg': 'LOGIN_FAILED'})
         except WxAuthException as e:
-            return Response({'status': 2, 'err_msg': e})
+            return Response({'status': 2, 'err_msg': e.error_msg})
         except RequestException as _:
             return Response({'status': 3, 'err_msg': 'SERVER_NETWORK_ERROR'})
         except ParamMissException as e:
-            return Response({'status': 4, 'err_msg': e})
+            return Response({'status': 4, 'err_msg': e.error_msg})
     return wrapper
