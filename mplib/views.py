@@ -277,7 +277,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         return Response('Unsupported Method')
 
     @action(methods=['get'], detail=False)
-    # @trouble_shooter
+    @trouble_shooter
     def vertify_session(self, request):
         user = models.User.objects.get(session=request.query_params.get('session', ''))
         if user.libAccount is None:
