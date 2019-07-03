@@ -302,13 +302,13 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         response = requests.request("GET", url, data='', headers=headers, params=querystring)
         result = response.json()
         user = models.User.objects.get(session=request.query_params.get('session', ''))
-        if result['errorcode'] == 0:
+        if result['errcode'] == 0:
             user.wxSessionKey = result['session_key']
             user.save()
             session = check_session(user.session)
             return Response({'status': 0, 'session': session})
         else:
-            raise WxAuthException(err_code=result['errorcode'])
+            raise WxAuthException(err_code=result['errcode'])
 
     @action(methods=['get'], detail=False)
     @trouble_shooter
@@ -324,6 +324,8 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         }
         response = requests.request("GET", url, data='', headers=headers, params=querystring)
         result = response.json()
+        if not result['errcode'] == 0:
+            raise WxAuthException(err_code=result['errcode'])
         openid = result['openid']
         sessionKey = result['session_key']
         nickName = request.query_params.get('nickName', '')
