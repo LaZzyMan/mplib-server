@@ -359,3 +359,29 @@ libuser/hold_req_cancel
 - tel
 - contents
 - ...
+
+## 报错信息
+
+```python
+# 正常返回(返回中包含session)
+status: 0
+# session错误
+status: 1
+err_msg: LOGIN_FAILED
+# 微信登录返回错误
+status: 2
+err_msg: 返回微信报错
+# 服务器网络错误
+status: 3
+err_msg: SERVER_NETWORK_ERROR
+# 参数缺少
+status: 4
+err_msg: PARAM_参数名_MISS
+# RSA密钥错误
+status: 5
+err_msg: RSA_KEY_ERROR
+# 图书馆接口返回错误
+status: 6
+err_msg: 图书馆错误接口
+err_detail: 图书馆接口具体报错返回
+```
