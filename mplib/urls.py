@@ -13,7 +13,7 @@ router.register(r'advise', views.AdviseViewSet, base_name='advise')
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'schema', views.schema_view),
-    url(r'test', tmpview.test),
+    # url(r'test', tmpview.test),
     # url(r'rank', tmpview.rank),
     # url(r'detail', tmpview.rank),
     # url(r'search_lib', tmpview.search_lib),
