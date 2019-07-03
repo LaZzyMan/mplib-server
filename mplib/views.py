@@ -16,6 +16,7 @@ from mplib.encryption import PRIVATE_KEY
 from django.contrib.auth.hashers import make_password, check_password
 from silk.profiling.profiler import silk_profile
 from mplib.error import trouble_shooter, WxAuthException
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class TimeFilter(filters.BaseFilterBackend):
@@ -277,6 +278,11 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         return Response('Unsupported Method')
 
     @action(methods=['get'], detail=False)
+    def test(self, request):
+        a = request.query_params.get('a')
+        return Response({'a': a})
+
+    @action(methods=['get'], detail=False)
     @trouble_shooter
     def vertify_session(self, request):
         user = models.User.objects.get(session=request.query_params.get('session'))
@@ -337,10 +343,10 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         try:
             user = models.User.objects.get(openId=openid)
             if user.libAccount is None:
-                return Response({'session': user.session, 'libBind': False})
+                return Response({'status': 0, 'session': user.session, 'libBind': False})
             else:
-                return Response({'session': user.session, 'libBind': True})
-        except:
+                return Response({'status': 0, 'session': user.session, 'libBind': True})
+        except ObjectDoesNotExist as _:
             user = models.User(openId=openid,
                                nickName=nickName,
                                wxSessionKey=sessionKey,
@@ -354,7 +360,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
                                sessionDate=datetime.now(),
                                lastLoginTime=datetime.now())
             user.save()
-            return Response({'session': user.session, 'libBind': False})
+            return Response({'status': 0, 'session': user.session, 'libBind': False})
 
     @action(methods=['get'], detail=False)
     def bind_lib(self, request):
