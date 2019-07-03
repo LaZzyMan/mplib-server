@@ -116,7 +116,7 @@ class LibUserViewSet(viewsets.ReadOnlyModelViewSet):
     @action(methods=['get'], detail=False)
     @trouble_shooter
     def bor_info(self, request):
-        check_param('session', request)
+        check_param(['session'], request)
         session = request.query_params.get('session')
         user = models.User.objects.get(session=session)
         result = self.xi.bor_info(uid=user.libAccount.libId)
@@ -126,7 +126,7 @@ class LibUserViewSet(viewsets.ReadOnlyModelViewSet):
     @action(methods=['get'], detail=False)
     @trouble_shooter
     def borrow_info(self, request):
-        check_param('session', request)
+        check_param(['session'], request)
         session = request.query_params.get('session')
         user = models.User.objects.get(session=session)
         result = self.xi.bor_info(uid=user.libAccount.libId)
@@ -136,7 +136,7 @@ class LibUserViewSet(viewsets.ReadOnlyModelViewSet):
     @action(methods=['get'], detail=False)
     @trouble_shooter
     def loan_history(self, request):
-        check_param('session', request)
+        check_param(['session'], request)
         session = request.query_params.get('session', '')
         user = models.User.objects.get(session=session)
         result = self.xi.loan_history_detail(bor_id=user.libAccount.libId)
@@ -146,7 +146,7 @@ class LibUserViewSet(viewsets.ReadOnlyModelViewSet):
     @action(methods=['get'], detail=False)
     @trouble_shooter
     def visit_info(self, request):
-        check_param('session', request)
+        check_param(['session'], request)
         session = request.query_params.get('session', '')
         user = models.User.objects.get(session=session)
         result = self.xi.bor_visit_info(bor_id=user.libAccount.libId)
@@ -156,7 +156,7 @@ class LibUserViewSet(viewsets.ReadOnlyModelViewSet):
     @action(methods=['get'], detail=False)
     @trouble_shooter
     def hold_info(self, request):
-        check_param('session', request)
+        check_param(['session'], request)
         session = request.query_params.get('session', '')
         user = models.User.objects.get(session=session)
         result = self.xi.bor_info(uid=user.libAccount.libId)

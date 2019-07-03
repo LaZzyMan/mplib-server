@@ -186,8 +186,9 @@ class XInterface(object):
         }
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
-        self.catch_error(et, err_msg='LIB_PRESENT_ERROR')
         records = et.findall('record')
+        if len(records) == 0:
+            self.catch_error(et, err_msg='LIB_PRESENT_ERROR')
         books = []
         try:
             if lang == 'cn':
@@ -532,12 +533,13 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
+    # xi.bor_info(uid='00031971')
+    xi.bor_visit_info(bor_id='00031971')
+    xi.loan_history_detail(bor_id='00031971')
+    xi.present(set_number='013978', set_entry=1)
     xi.x_bor_info(bor_id='201530259008')
-    xi.bor_visit_info(bor_id='2015302590005')
-    xi.loan_history_detail(bor_id='201530259003')
     xi.bor_rank()
     auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
-    xi.bor_info(uid='2016302590080')
     set_info = xi.find(request='东野圭吾', code='wu')
     present_info = xi.present(set_number='076131', set_entry=1, lang='cn')
     xi.circ_status(sys_no='001350497')
