@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 import re
+from mplib.error import LibException
 
 URL = 'http://opac.lib.whu.edu.cn/X'
 ALPHA_URL = 'http://api.lib.whu.edu.cn/aleph-x/bor/oper'
@@ -92,11 +93,8 @@ class XInterface(object):
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
         self.session = et.find('session-id').text
-        try:
-            err_message = et.find('error').text
-            return {'result': 1, 'error': err_message}
-        except AttributeError as _:
-            return {'result': 0, 'bor_id': et.find('./z303/z303-id').text}
+        self.catch_error(et, err_msg='BOR_AUTH_ERROR')
+        return {'bor_id': et.find('./z303/z303-id').text}
 
     def bor_info(self, uid):
         '''
@@ -113,30 +111,34 @@ class XInterface(object):
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
         self.session = et.find('session-id').text
+        self.catch_error(et, err_msg='BOR_INFO_ERROR')
         loan_list = []
         # fine_list = []
         hold_list = []
         loans = et.findall('item-l')
         # fines = et.findall('fine')
         holds = et.findall('item-h')
-        for hold in holds:
-            hold_list.append({'hold_info': self.z37_to_dict(hold.find('z37')),
-                              'book_info': self.z13_to_dict(hold.find('z13')),
-                              'bar_code': hold.find('./z30/z30-barcode').text})
-        for loan in loans:
-            loan_list.append({'loan_info': self.z36_to_dict(loan.find('z36')),
-                              'book_info': self.z13_to_dict(loan.find('z13')),
-                              'bar_code': loan.find('./z30/z30-barcode').text})
-        bor_info = {
-            'name': et.find('./z303/z303-name').text,
-            'birthday': et.find('./z303/z303-birth-date').text,
-            'gender': et.find('./z303/z303-gender').text,
-            'department': et.find('./z304/z304-address-1').text,
-            'prof': et.find('./z304/z304-address-2').text,
-            'email': et.find('./z304/z304-email-address').text,
-            'telephone': et.find('./z304/z304-telephone').text,
-            'type': et.find('./z305/z305-bor-type').text
-        }
+        try:
+            for hold in holds:
+                hold_list.append({'hold_info': self.z37_to_dict(hold.find('z37')),
+                                  'book_info': self.z13_to_dict(hold.find('z13')),
+                                  'bar_code': hold.find('./z30/z30-barcode').text})
+            for loan in loans:
+                loan_list.append({'loan_info': self.z36_to_dict(loan.find('z36')),
+                                  'book_info': self.z13_to_dict(loan.find('z13')),
+                                  'bar_code': loan.find('./z30/z30-barcode').text})
+            bor_info = {
+                'name': et.find('./z303/z303-name').text,
+                'birthday': et.find('./z303/z303-birth-date').text,
+                'gender': et.find('./z303/z303-gender').text,
+                'department': et.find('./z304/z304-address-1').text,
+                'prof': et.find('./z304/z304-address-2').text,
+                'email': et.find('./z304/z304-email-address').text,
+                'telephone': et.find('./z304/z304-telephone').text,
+                'type': et.find('./z305/z305-bor-type').text
+            }
+        except AttributeError as _:
+            raise LibException('XML_RESOLVE_ERROR')
         return {
             'loan': loan_list,
             'hold': hold_list,
@@ -161,14 +163,10 @@ class XInterface(object):
         }
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
-        try:
-            err_message = et.find('error').text
-            print(err_message)
-            return False
-        except AttributeError as _:
-            return {'set_number': et.find('set_number').text,
-                    'no_records': int(et.find('no_records').text),
-                    'no_entries': int(et.find('no_entries').text)}
+        self.catch_error(et, err_msg='LIB_FIND_ERROR')
+        return {'set_number': et.find('set_number').text,
+                'no_records': int(et.find('no_records').text),
+                'no_entries': int(et.find('no_entries').text)}
 
     def present(self, set_number, set_entry, lang='cn'):
         '''
@@ -188,58 +186,62 @@ class XInterface(object):
         }
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
+        self.catch_error(et, err_msg='LIB_PRESENT_ERROR')
         records = et.findall('record')
         books = []
-        if lang == 'cn':
-            for record in records:
-                book = {}
-                book['doc_number'] = record.find('doc_number').text
-                title = record.find(".//varfield[@id='200']/subfield[@label='a']")
-                version = record.find(".//varfield[@id='205']/subfield[@label='a']")
-                publish = record.find(".//varfield[@id='210']/subfield[@label='c']")
-                year = record.find(".//varfield[@id='210']/subfield[@label='d']")
-                page = record.find(".//varfield[@id='215']/subfield[@label='a']")
-                description = record.find(".//varfield[@id='330']/subfield[@label='a']")
-                reader = record.find(".//varfield[@id='333']/subfield[@label='a']")
-                theme = record.find(".//varfield[@id='606']/subfield[@label='a']")
-                author = record.find(".//varfield[@id='701']/subfield[@label='a']")
-                isbn = record.find(".//varfield[@id='905']/subfield[@label='s']")
-                book['title'] = '' if title is None else title.text
-                book['version'] = '' if version is None else version.text
-                book['publish'] = '' if publish is None else publish.text
-                book['year'] = '' if year is None else year.text
-                book['page'] = '' if page is None else page.text
-                book['description'] = '' if description is None else description.text
-                book['reader'] = '' if reader is None else reader.text
-                book['author'] = '' if author is None else author.text
-                book['theme'] = '' if theme is None else theme.text
-                book['no_call'] = '' if isbn is None else isbn.text
-                books.append(book)
-        else:
-            for record in records:
-                book = {}
-                book['doc_number'] = record.find('doc_number').text
-                title = record.find(".//varfield[@id='245']/subfield[@label='a']")
-                version = record.find(".//varfield[@id='250']/subfield[@label='a']")
-                publish = record.find(".//varfield[@id='264']/subfield[@label='a']")
-                year = record.find(".//varfield[@id='264']/subfield[@label='c']")
-                page = record.find(".//varfield[@id='300']/subfield[@label='a']")
-                description = record.find(".//varfield[@id='505']/subfield[@label='a']")
-                reader = record.find(".//varfield[@id='333']/subfield[@label='a']")
-                theme = record.find(".//varfield[@id='650']/subfield[@label='a']")
-                author = record.find(".//varfield[@id='100']/subfield[@label='a']")
-                isbn = record.find(".//varfield[@id='905']/subfield[@label='s']")
-                book['title'] = '' if title is None else title.text
-                book['version'] = '' if version is None else version.text
-                book['publish'] = '' if publish is None else publish.text
-                book['year'] = '' if year is None else year.text
-                book['page'] = '' if page is None else page.text
-                book['description'] = '' if description is None else description.text
-                book['reader'] = '' if reader is None else reader.text
-                book['author'] = '' if author is None else author.text
-                book['theme'] = '' if theme is None else theme.text
-                book['no_call'] = '' if isbn is None else isbn.text
-                books.append(book)
+        try:
+            if lang == 'cn':
+                for record in records:
+                    book = {}
+                    book['doc_number'] = record.find('doc_number').text
+                    title = record.find(".//varfield[@id='200']/subfield[@label='a']")
+                    version = record.find(".//varfield[@id='205']/subfield[@label='a']")
+                    publish = record.find(".//varfield[@id='210']/subfield[@label='c']")
+                    year = record.find(".//varfield[@id='210']/subfield[@label='d']")
+                    page = record.find(".//varfield[@id='215']/subfield[@label='a']")
+                    description = record.find(".//varfield[@id='330']/subfield[@label='a']")
+                    reader = record.find(".//varfield[@id='333']/subfield[@label='a']")
+                    theme = record.find(".//varfield[@id='606']/subfield[@label='a']")
+                    author = record.find(".//varfield[@id='701']/subfield[@label='a']")
+                    isbn = record.find(".//varfield[@id='905']/subfield[@label='s']")
+                    book['title'] = '' if title is None else title.text
+                    book['version'] = '' if version is None else version.text
+                    book['publish'] = '' if publish is None else publish.text
+                    book['year'] = '' if year is None else year.text
+                    book['page'] = '' if page is None else page.text
+                    book['description'] = '' if description is None else description.text
+                    book['reader'] = '' if reader is None else reader.text
+                    book['author'] = '' if author is None else author.text
+                    book['theme'] = '' if theme is None else theme.text
+                    book['no_call'] = '' if isbn is None else isbn.text
+                    books.append(book)
+            else:
+                for record in records:
+                    book = {}
+                    book['doc_number'] = record.find('doc_number').text
+                    title = record.find(".//varfield[@id='245']/subfield[@label='a']")
+                    version = record.find(".//varfield[@id='250']/subfield[@label='a']")
+                    publish = record.find(".//varfield[@id='264']/subfield[@label='a']")
+                    year = record.find(".//varfield[@id='264']/subfield[@label='c']")
+                    page = record.find(".//varfield[@id='300']/subfield[@label='a']")
+                    description = record.find(".//varfield[@id='505']/subfield[@label='a']")
+                    reader = record.find(".//varfield[@id='333']/subfield[@label='a']")
+                    theme = record.find(".//varfield[@id='650']/subfield[@label='a']")
+                    author = record.find(".//varfield[@id='100']/subfield[@label='a']")
+                    isbn = record.find(".//varfield[@id='905']/subfield[@label='s']")
+                    book['title'] = '' if title is None else title.text
+                    book['version'] = '' if version is None else version.text
+                    book['publish'] = '' if publish is None else publish.text
+                    book['year'] = '' if year is None else year.text
+                    book['page'] = '' if page is None else page.text
+                    book['description'] = '' if description is None else description.text
+                    book['reader'] = '' if reader is None else reader.text
+                    book['author'] = '' if author is None else author.text
+                    book['theme'] = '' if theme is None else theme.text
+                    book['no_call'] = '' if isbn is None else isbn.text
+                    books.append(book)
+        except AttributeError as _:
+            raise LibException('XML_RESOLVE_ERROR')
         return books
 
     def circ_status(self, sys_no, lang='cn'):
@@ -258,18 +260,22 @@ class XInterface(object):
         }
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
+        self.catch_error(et, err_msg='LIB_CIRC_ERROR')
         items = et.findall('item-data')
         books = []
-        for item in items:
-            book = {}
-            book['loan_status'] = item.find('loan-status').text
-            book['due_date'] = item.find('due-date').text
-            book['due_hour'] = item.find('due-hour').text
-            book['sub_library'] = item.find('sub-library').text
-            book['bar_code'] = item.find('barcode').text
-            book['location'] = item.find('location').text
-            book['rfid'] = 'https://opac.lib.whu.edu.cn/rfid-pos/graph.aspx?bookid=' + book['bar_code']
-            books.append(book)
+        try:
+            for item in items:
+                book = {}
+                book['loan_status'] = item.find('loan-status').text
+                book['due_date'] = item.find('due-date').text
+                book['due_hour'] = item.find('due-hour').text
+                book['sub_library'] = item.find('sub-library').text
+                book['bar_code'] = item.find('barcode').text
+                book['location'] = item.find('location').text
+                book['rfid'] = 'https://opac.lib.whu.edu.cn/rfid-pos/graph.aspx?bookid=' + book['bar_code']
+                books.append(book)
+        except AttributeError as _:
+            raise LibException('XML_RESOLVE_ERROR')
         return books
 
     def renew(self, bar_code, bor_id):
@@ -289,15 +295,8 @@ class XInterface(object):
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
         self.session = et.find('session-id').text
-        try:
-            reply = et.find('reply').text
-            if reply == 'ok':
-                return {'result': 0}
-            else:
-                return {'result': 1}
-        except AttributeError as _:
-            print(response.content.decode('utf-8'))
-            return {'result': 1}
+        self.catch_error(et, err_msg='LIB_RENEW_ERROR')
+        return
 
     def hold_req_nlc(self, bar_code, bor_id, pickup_loc):
         '''
@@ -318,19 +317,8 @@ class XInterface(object):
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
         self.session = et.find('session-id').text
-        try:
-            reply = et.find('reply').text
-            if reply == 'ok':
-                return {'result': 0}
-            else:
-                return {'result': 1}
-        except AttributeError as _:
-            error = et.find('error-text-1')
-            if not error is None:
-                return {'result': 1, 'err_msg': error.text}
-            else:
-                print(response.content.decode('utf-8'))
-                return {'result': 1, 'err_msg': 'unknown'}
+        self.catch_error(et, err_msg='HOLD_REQ_ERROR')
+        return
 
     def hold_req_cancel(self, doc_number, bor_id, item_sequence, sequence):
         '''
@@ -353,11 +341,8 @@ class XInterface(object):
         response = requests.request('GET', url=self.url, headers=self.headers, params=params)
         et = ET.fromstring(response.content.decode('utf-8'))
         self.session = et.find('session-id').text
-        try:
-            err_message = et.find('error').text
-            return {'result': 1, 'error': err_message}
-        except AttributeError as _:
-            return {'result': 0}
+        self.catch_error(et, err_msg='HOLD_CANCEL_ERROR')
+        return
 
     def loan_history_detail(self, bor_id):
         '''
@@ -375,6 +360,8 @@ class XInterface(object):
         }
         response = requests.request("POST", self.alpha_url, data=payload, headers=headers)
         result = response.json()
+        if 'error' in result[0].values():
+            raise LibException(err_msg='LOAN_HISTORY_ERROR', err_detail=result[0]['value'])
         return result
 
     def x_bor_info(self, bor_id):
@@ -388,7 +375,12 @@ class XInterface(object):
         }
         response = requests.request("POST", self.alpha_url, data=payload, headers=headers)
         result = response.json()
-        return result
+        result_json = {}
+        for i in result:
+            result_json[i['name']] = i['value']
+        if 'error' in result_json:
+            raise LibException(err_msg='BOR_INFO_ERROR', err_detail=result_json['error'])
+        return result_json
 
     def bor_rank(self, lang='ALL', category='ALL', time='y'):
         '''
@@ -409,18 +401,6 @@ class XInterface(object):
                              'title': item.text.split('    ')[0].split('(')[0],
                              'author': re.findall('\((.*?)\)', item.text.split('    ')[0])[-1].strip()})
         return rank
-
-    def item_data_nlc(self, doc_number, lang='cn'):
-        lib = self.cn_lib if lang == 'cn' else self.en_lib
-        params = {
-            "op": "item_data_nlc",
-            "doc_number": doc_number,
-            "base": lib,
-            "session": self.session
-        }
-        response = requests.request('GET', url=self.url, headers=self.headers, params=params)
-        et = ET.fromstring(response.content.decode('utf-8'))
-        items = et.findall('item-data')
 
     def bor_visit_info(self, bor_id):
         '''
@@ -463,9 +443,9 @@ class XInterface(object):
         for item in response.json():
             result[item['name']] = item['value']
         if result['error'] == 'ok':
-            return {'result': 0}
+            return
         else:
-            return {'result': 1}
+            raise LibException(err_msg='UPDATE_EMAIL_ERROR', err_detail=result['error'])
 
     def update_telephone(self, bor_id, tel):
         '''
@@ -487,9 +467,9 @@ class XInterface(object):
         for item in response.json():
             result[item['name']] = item['value']
         if result['error'] == 'ok':
-            return {'result': 0}
+            return
         else:
-            return {'result': 1}
+            raise LibException(err_msg='UPDATE_TEL_ERROR', err_detail=result['error'])
 
     @staticmethod
     def z13_to_dict(et):
@@ -540,23 +520,31 @@ class XInterface(object):
             'isbn': et.find('z13-isbn-issn').text
         }
 
+    @staticmethod
+    def catch_error(et, err_msg):
+        if not et.find('error') is None:
+            raise LibException(err_msg=err_msg, err_detail=et.find('error').text)
+        if not et.find('error-text-1') is None:
+            raise LibException(err_msg=err_msg, err_detail=et.find('error-text-1').text)
+        if not et.find('error-text-2') is None:
+            raise LibException(err_msg=err_msg, err_detail=et.find('error-text-2').text)
+
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
+    xi.x_bor_info(bor_id='201530259008')
+    xi.bor_visit_info(bor_id='2015302590005')
+    xi.loan_history_detail(bor_id='201530259003')
+    xi.bor_rank()
+    auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
+    xi.bor_info(uid='2016302590080')
+    set_info = xi.find(request='东野圭吾', code='wu')
+    present_info = xi.present(set_number='076131', set_entry=1, lang='cn')
+    xi.circ_status(sys_no='001350497')
     xi.update_email('2016302590080', 'gaoyanxilin@163.com')
     xi.update_telephone('2016302590080', '15629099660')
-    xi.bor_info(uid='2016302590080')
-    xi.bor_visit_info(bor_id='2016302590080')
-    xi.loan_history_detail(bor_id='2015302590030')
-    set_info = xi.find(request='东野圭吾', code='wau')
-    present_info = xi.present(set_number='076131', set_entry=1, lang='cn')
-    xi.item_data_nlc(doc_number='001351039')
-    # xi.circ_status(sys_no='001350497')
-    xi.bor_rank()
     xi.hold_req_nlc(bor_id='ID900162486', bar_code='101102382884', pickup_loc='WL')
     xi.renew(bor_id='2016302590080', bar_code='101100356208')
-    auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
-    xi.x_bor_info(bor_id='2015302590078')
     set_info = xi.find(request='高等数学')
     xi.bor_auth(uid='2015302590005', verification='180856')
 

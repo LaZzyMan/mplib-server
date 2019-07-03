@@ -5,14 +5,14 @@ from django.contrib.auth.models import User as AdminUser
 
 
 class LibUser(models.Model):
-    libId = models.CharField(verbose_name='lib id', max_length=30, primary_key=True)
+    libId = models.CharField(verbose_name='图书馆账号', max_length=30, primary_key=True)
     libBorId = models.CharField(verbose_name='lib bor id', max_length=50, null=True)
-    libPsw = models.CharField(verbose_name='lib password', max_length=200)
-    name = models.CharField(verbose_name='name', max_length=20, null=True)
-    department = models.CharField(verbose_name='name', max_length=100, null=True)
-    readerType = models.CharField(verbose_name='name', max_length=20, null=True)
-    registrationDate = models.DateField(verbose_name='registration date', null=True)
-    expiryDate = models.DateField(verbose_name='expiry data', null=True)
+    libPsw = models.CharField(verbose_name='密码', max_length=200)
+    name = models.CharField(verbose_name='姓名', max_length=20, null=True)
+    department = models.CharField(verbose_name='院系', max_length=100, null=True)
+    readerType = models.CharField(verbose_name='读者类型', max_length=20, null=True)
+    registrationDate = models.DateField(verbose_name='注册时间', null=True)
+    expiryDate = models.DateField(verbose_name='过期时间', null=True)
 
     class Meta:
         verbose_name = '图书馆用户管理'
@@ -22,17 +22,17 @@ class LibUser(models.Model):
 class User(models.Model):
     openId = models.CharField(verbose_name='open id', max_length=100, null=True)
     wxSessionKey = models.CharField(verbose_name='wx session key', max_length=100, null=True)
-    libAccount = models.ForeignKey(LibUser, on_delete=models.SET_NULL, verbose_name='lib account', blank=True, null=True, db_index=True, related_name='lib')
+    libAccount = models.ForeignKey(LibUser, on_delete=models.SET_NULL, verbose_name='图书馆账户', blank=True, null=True, db_index=True, related_name='lib')
     session = models.CharField(verbose_name='session', max_length=100, null=True)
-    sessionDate = models.DateTimeField(verbose_name='session used time', null=True)
+    sessionDate = models.DateTimeField(verbose_name='session更新时间', null=True)
     id = models.CharField(verbose_name='id', max_length=100, primary_key=True)
-    nickName = models.CharField(verbose_name='nick name', max_length=100, null=True)
-    avatarUrl = models.CharField(verbose_name='avatar url', max_length=200, null=True)
-    gender = models.IntegerField(verbose_name='gender', null=True)
-    province = models.CharField(verbose_name='province', max_length=100, null=True)
-    city = models.CharField(verbose_name='city', max_length=100, null=True)
-    country = models.CharField(verbose_name='country', max_length=100, null=True)
-    lastLoginTime = models.DateTimeField(verbose_name='last login time', null=True)
+    nickName = models.CharField(verbose_name='昵称', max_length=100, null=True)
+    avatarUrl = models.CharField(verbose_name='头像URL', max_length=200, null=True)
+    gender = models.IntegerField(verbose_name='性别', null=True)
+    province = models.CharField(verbose_name='省份', max_length=100, null=True)
+    city = models.CharField(verbose_name='城市', max_length=100, null=True)
+    country = models.CharField(verbose_name='国家', max_length=100, null=True)
+    lastLoginTime = models.DateTimeField(verbose_name='最近登录', null=True)
 
     def __str__(self):
         return self.nickName

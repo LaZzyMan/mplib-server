@@ -53,4 +53,4 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('wxSessionKey', 'id', 'session', 'openId', 'libAccount')
+        fields = ('id', )

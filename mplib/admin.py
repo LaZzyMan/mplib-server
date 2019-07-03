@@ -176,9 +176,20 @@ class AdviseAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    pass
+    list_per_page = 30
+    view_on_site = False
+    list_display = ('nickName', 'libAccount', 'gender', 'country', 'province', 'city', 'lastLoginTime')
+    list_filter = ('gender', 'province', 'city')
+    search_fields = ('nickName', )
+    date_hierarchy = 'lastLoginTime'
+    fields = ('nickName', 'libAccount', 'gender', 'country', 'province', 'city', 'avatarUrl', 'lastLoginTime')
 
 
 @admin.register(LibUser)
 class LibUserAdmin(admin.ModelAdmin):
-    pass
+    list_per_page = 30
+    view_on_site = False
+    list_display = ('libId', 'name', 'department', 'readerType')
+    list_filter = ('department', 'readerType')
+    search_fields = ('libId', )
+    fields = ('libId', 'name', 'department', 'readerType', 'registrationDate', 'expiryDate')
