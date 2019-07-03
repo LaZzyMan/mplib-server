@@ -15,7 +15,7 @@ import base64
 from mplib.encryption import PRIVATE_KEY
 from django.contrib.auth.hashers import make_password, check_password
 from silk.profiling.profiler import silk_profile
-from mplib.error import trouble_shooter, WxAuthException
+from mplib.error import trouble_shooter, WxAuthException, ParamMissException
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -278,11 +278,6 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         return Response('Unsupported Method')
 
     @action(methods=['get'], detail=False)
-    def test(self, request):
-        a = request.query_params.get('a')
-        return Response({'a': a})
-
-    @action(methods=['get'], detail=False)
     @trouble_shooter
     def vertify_session(self, request):
         user = models.User.objects.get(session=request.query_params.get('session'))
@@ -308,7 +303,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         response = requests.request("GET", url, data='', headers=headers, params=querystring)
         result = response.json()
         user = models.User.objects.get(session=request.query_params.get('session', ''))
-        if result['errcode'] == 0:
+        if 'errcode' not in result:
             user.wxSessionKey = result['session_key']
             user.save()
             session = check_session(user.session)
@@ -319,9 +314,12 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     @action(methods=['get'], detail=False)
     @trouble_shooter
     def login(self, request):
+        code = request.query_params.get('code')
+        if code is None:
+            raise ParamMissException(err='code')
         url = 'https://api.weixin.qq.com/sns/jscode2session'
         querystring = {'appid': 'wx8ae3e8607ee301fd',
-                       'js_code': request.query_params.get('code', ''),
+                       'js_code': code,
                        'secret': 'df249bf353c20060748c5e40a334ad62',
                        'grant_type': 'authorization_code'}
         headers = {
@@ -330,7 +328,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         }
         response = requests.request("GET", url, data='', headers=headers, params=querystring)
         result = response.json()
-        if not result['errcode'] == 0:
+        if 'errcode' in result:
             raise WxAuthException(err_code=result['errcode'])
         openid = result['openid']
         sessionKey = result['session_key']
@@ -363,20 +361,28 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({'status': 0, 'session': user.session, 'libBind': False})
 
     @action(methods=['get'], detail=False)
+    @trouble_shooter
     def bind_lib(self, request):
-        try:
-            user = models.User.objects.get(session=request.query_params.get('session', ''))
-            libuser = models.LibUser.objects.get(libId=request.query_params.get('libId', ''))
-            user.libAccount = libuser
-            user.save()
-            session = check_session(user.session)
-            return Response({'status': 0, 'session': session})
-        except:
-            return Response({'status': 1})
+        session = request.query_params.get('session', '')
+        if session is None:
+            raise ParamMissException(err='session')
+        libId = request.query_params.get('libId', '')
+        if libId is None:
+            raise ParamMissException(err='lidId')
+        user = models.User.objects.get(session=session)
+        libuser = models.LibUser.objects.get(libId=libId)
+        user.libAccount = libuser
+        user.save()
+        session = check_session(user.session)
+        return Response({'status': 0, 'session': session})
 
     @action(methods=['get'], detail=False)
+    @trouble_shooter
     def unbind_lib(self, request):
-        user = models.User.objects.get(session=request.query_params.get('session', ''))
+        session = request.query_params.get('session', '')
+        if session is None:
+            raise ParamMissException(err='session')
+        user = models.User.objects.get(session=session)
         user.libAccount = None
         user.save()
         session = check_session(user.session)

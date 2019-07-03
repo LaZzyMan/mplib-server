@@ -13,6 +13,15 @@ class SessionException(Exception):
         return self.error_msg
 
 
+class ParamMissException(Exception):
+    def __init__(self, err='param'):
+        self.error_msg = 'PARAM_%s_MISS' % err.upper()
+        super().__init__(self, self.error_msg)
+
+    def __str__(self):
+        return self.error_msg
+
+
 class WxAuthException(Exception):
     def __init__(self, err_code=0):
         if err_code == 40029:
@@ -38,4 +47,6 @@ def trouble_shooter(func):
             return Response({'status': 2, 'err_msg': e})
         except RequestException as _:
             return Response({'status': 3, 'err_msg': 'SERVER_NETWORK_ERROR'})
+        except ParamMissException as e:
+            return Response({'status': 4, 'err_msg': e})
     return wrapper
