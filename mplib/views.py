@@ -15,7 +15,7 @@ import base64
 from mplib.encryption import PRIVATE_KEY
 from django.contrib.auth.hashers import make_password, check_password
 from silk.profiling.profiler import silk_profile
-from mplib.error import trouble_shooter
+from mplib.error import trouble_shooter, WxAuthException
 
 
 class TimeFilter(filters.BaseFilterBackend):
@@ -279,15 +279,16 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     @action(methods=['get'], detail=False)
     @trouble_shooter
     def vertify_session(self, request):
-        user = models.User.objects.get(session=request.query_params.get('session', ''))
+        user = models.User.objects.get(session=request.query_params.get('session'))
         if user.libAccount is None:
             session = check_session(user.session)
-            return Response({'login': True, 'libBind': False, 'session': session})
+            return Response({'status': 0, 'login': True, 'libBind': False, 'session': session})
         else:
             session = check_session(user.session)
-            return Response({'login': True, 'libBind': True, 'session': session})
+            return Response({'status': 0, 'login': True, 'libBind': True, 'session': session})
 
     @action(methods=['get'], detail=False)
+    @trouble_shooter
     def update_session(self, request):
         url = 'https://api.weixin.qq.com/sns/jscode2session'
         querystring = {'appid': 'wx8ae3e8607ee301fd',
@@ -307,10 +308,10 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             session = check_session(user.session)
             return Response({'status': 0, 'session': session})
         else:
-            session = check_session(user.session)
-            return Response({'status': 1, 'session': session})
+            raise WxAuthException(err_code=result['errorcode'])
 
     @action(methods=['get'], detail=False)
+    @trouble_shooter
     def login(self, request):
         url = 'https://api.weixin.qq.com/sns/jscode2session'
         querystring = {'appid': 'wx8ae3e8607ee301fd',
