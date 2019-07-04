@@ -53,7 +53,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'silk.middleware.SilkyMiddleware',
-    'mplib.InterceptMiddleware.InterceptMiddleware',
+    # 'mplib.InterceptMiddleware.InterceptMiddleware',
 ]
 
 ROOT_URLCONF = 'djserver.urls'
