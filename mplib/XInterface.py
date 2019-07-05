@@ -115,7 +115,9 @@ class XInterface(object):
         loan_list = []
         # fine_list = []
         hold_list = []
+        fine_list = []
         loans = et.findall('item-l')
+        fines = et.findall('fine')
         # fines = et.findall('fine')
         holds = et.findall('item-h')
         try:
@@ -127,6 +129,10 @@ class XInterface(object):
                 loan_list.append({'loan_info': self.z36_to_dict(loan.find('z36')),
                                   'book_info': self.z13_to_dict(loan.find('z13')),
                                   'bar_code': loan.find('./z30/z30-barcode').text})
+            for fine in fines:
+                fine_list.append({'fine_info': self.z31_to_dict(fine.find('z31')),
+                                  'book_info': self.z13_to_dict(fine.find('z13')),
+                                  'bar_code': fine.find('./z30/z30-barcode').text})
             bor_info = {
                 'name': et.find('./z303/z303-name').text,
                 'birthday': et.find('./z303/z303-birth-date').text,
@@ -142,6 +148,10 @@ class XInterface(object):
         return {
             'loan': loan_list,
             'hold': hold_list,
+            'fine': {
+                'balance': et.find('balance').text,
+                'detail': fine_list
+            },
             'bor-info': bor_info
         }
 
@@ -512,13 +522,12 @@ class XInterface(object):
     @staticmethod
     def z31_to_dict(et):
         return {
-            'doc_number': et.find('z13-doc-number').text,
-            'year': et.find('z13-year').text,
-            'no_call': et.find('z13-call-no').text,
-            'author': et.find('z13-author').text,
-            'title': et.find('z13-title').text,
-            'publish': et.find('z13-imprint').text,
-            'isbn': et.find('z13-isbn-issn').text
+            'status': et.find('z31-status').text,
+            'sum': et.find('z31-net-sum').text,
+            'description': et.find('z31-description').text,
+            'date': et.find('z31-date').text,
+            'sequence': et.find('z31-sequence').text,
+            'id': et.find('z31-id').text
         }
 
     @staticmethod
@@ -533,7 +542,7 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
-    bor_info = xi.bor_info(uid='00009697')
+    bor_info = xi.bor_info(uid='00011771')
     xi.bor_visit_info(bor_id='00031971')
     xi.loan_history_detail(bor_id='00031971')
     xi.present(set_number='013978', set_entry=1)

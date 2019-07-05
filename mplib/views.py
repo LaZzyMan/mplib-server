@@ -145,6 +145,16 @@ class LibUserViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(methods=['get'], detail=False)
     @trouble_shooter
+    def fine_info(self, request):
+        check_param(['session'], request)
+        session = request.query_params.get('session')
+        user = models.User.objects.get(session=session)
+        result = self.xi.bor_info(uid=user.libAccount.libId)
+        session = check_session(session)
+        return Response({'status': 0, 'result': result['fine'], 'session': session})
+
+    @action(methods=['get'], detail=False)
+    @trouble_shooter
     def visit_info(self, request):
         check_param(['session'], request)
         session = request.query_params.get('session', '')
