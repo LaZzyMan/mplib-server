@@ -255,6 +255,35 @@ libuser/renew
 
 - session
 - status
+- reuslt
+
+### 欠费记录
+
+libuser/fine_info
+
+#### 参数
+
+- session
+
+#### 返回
+
+- session
+- status
+- result
+
+### 续借
+
+libuser/renew
+
+#### 参数
+
+- session
+- bar_code
+
+#### 返回
+
+- session
+- status
 
 ### 入馆记录
 

@@ -144,7 +144,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLEUI_INDEX = 'http://www.lib.whu.edu.cn/web/default.asp'
-SIMPLEUI_LOGO = 'https://avatars2.githubusercontent.com/u/13655483?s=60&v=4'
+SIMPLEUI_LOGO = 'http://system.lib.whu.edu.cn/mp-static/logo.png'
 SIMPLEUI_HOME_INFO = False
 
 SILKY_PYTHON_PROFILER = True
