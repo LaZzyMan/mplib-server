@@ -132,7 +132,7 @@ class XInterface(object):
                 'birthday': et.find('./z303/z303-birth-date').text,
                 'gender': et.find('./z303/z303-gender').text,
                 'department': et.find('./z304/z304-address-1').text,
-                'prof': et.find('./z304/z304-address-2').text,
+                'prof': et.find('./z304/z304-address-2').text if et.find('./z304/z304-address-2') is not None else '',
                 'email': et.find('./z304/z304-email-address').text,
                 'telephone': et.find('./z304/z304-telephone').text,
                 'type': et.find('./z305/z305-bor-type').text
@@ -533,7 +533,7 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
-    # xi.bor_info(uid='00031971')
+    bor_info = xi.bor_info(uid='00009697')
     xi.bor_visit_info(bor_id='00031971')
     xi.loan_history_detail(bor_id='00031971')
     xi.present(set_number='013978', set_entry=1)
