@@ -209,7 +209,7 @@ class IPKillerAdmin(admin.ModelAdmin):
     list_per_page = 50
     # save_on_top = True
     view_on_site = False
-    list_display = ('ip', 'time', 'visit', 'ip_stats')
+    list_display = ('ip', 'time', 'visit', 'stats')
     # ordering = ('-publishTime')
     list_filter = ('stats',)
     search_fields = ('ip', )
@@ -234,9 +234,4 @@ class IPKillerAdmin(admin.ModelAdmin):
     def has_ban_permission(self, request):
         opts = self.opts
         return request.user.has_perm('%s.%s' % (opts.app_label, 'ip_kill'))
-
-    def ip_stats(self, obj):
-        return not obj.stats
-
-    ip_stats.short_description = 'IP状态'
 

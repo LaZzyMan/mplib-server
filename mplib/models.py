@@ -111,7 +111,7 @@ class IPKiller(models.Model):
     ip = models.CharField(verbose_name='IP地址', max_length=100, null=True)
     time = models.DateTimeField(verbose_name='上次访问时间', null=True)
     visit = models.IntegerField(verbose_name='访问频率', null=True)
-    stats = models.BooleanField(verbose_name='封禁状态', null=True, default=False)
+    stats = models.BooleanField(verbose_name='IP状态', null=True, default=True)
 
     class Meta:
         verbose_name = 'IP封禁'
