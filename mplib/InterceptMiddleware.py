@@ -27,14 +27,14 @@ class InterceptMiddleware(MiddlewareMixin):
         user_ip = request.META['REMOTE_ADDR']
         try:
             record = IPKiller.objects.get(ip=user_ip)
-            if record.stats:
+            if not record.stats:
                 return JSONResponse({'status': -1, 'err_msg': 'SERVICE_ERROR'}, status=403)
         except IPKiller.DoesNotExist:
             IPKiller.objects.create(ip=user_ip, visit=1, time=timezone.now())
             return
         passed_seconds = (timezone.now() - record.time).seconds
         if record.visit > MAX_VISIT and passed_seconds < TIME_INTERVAL:
-            record.stats = True
+            record.stats = False
             record.save()
             return JSONResponse({'status': -1, 'err_msg': 'SERVICE_ERROR'}, status=403)
         else:
