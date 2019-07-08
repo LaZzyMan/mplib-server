@@ -1,5 +1,5 @@
 from django.contrib import admin
-from mplib.models import Notice, LibUser, User, Activity, Advise
+from mplib.models import Notice, LibUser, User, Activity, Advise, IPKiller
 import uuid
 from django.contrib import messages
 from django.contrib.auth.models import User as AdminUser
@@ -73,7 +73,7 @@ class ActivityForm(forms.ModelForm):
 @admin.register(Notice)
 class NoticeAdmin(admin.ModelAdmin):
     form = NoticeForm
-    list_per_page = 30
+    list_per_page = 50
     # save_on_top = True
     view_on_site = False
     list_display = ('title', 'id', 'publishTime', 'pubUser', 'urlEnable', 'color_stats')
@@ -152,7 +152,7 @@ class ActivityAdmin(admin.ModelAdmin):
 @admin.register(Advise)
 class AdviseAdmin(admin.ModelAdmin):
     form = AdviseForm
-    list_per_page = 30
+    list_per_page = 50
     # save_on_top = True
     view_on_site = False
     list_display = ('id', 'publishTime', 'contents', 'solveUser', 'result', 'stats')
@@ -176,7 +176,7 @@ class AdviseAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_per_page = 30
+    list_per_page = 50
     view_on_site = False
     list_display = ('nickName', 'libAccount', 'gender_name', 'country', 'province', 'city', 'lastLoginTime')
     list_filter = ('gender', 'province', 'city')
@@ -196,9 +196,47 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(LibUser)
 class LibUserAdmin(admin.ModelAdmin):
-    list_per_page = 30
+    list_per_page = 50
     view_on_site = False
     list_display = ('libId', 'name', 'department', 'readerType')
     list_filter = ('department', 'readerType')
     search_fields = ('libId', )
     fields = ('libId', 'name', 'department', 'readerType', 'registrationDate', 'expiryDate')
+
+
+@admin.register(IPKiller)
+class IPKillerAdmin(admin.ModelAdmin):
+    list_per_page = 50
+    # save_on_top = True
+    view_on_site = False
+    list_display = ('ip', 'time', 'visit', 'ip_stats')
+    # ordering = ('-publishTime')
+    list_filter = ('stats', 'solveUser')
+    search_fields = ('contents', )
+    date_hierarchy = 'publishTime'
+    fields = ('ip', 'time', 'visit', 'stats')
+    readonly_fields = ('ip', 'time', 'visit', 'stats')
+
+    actions = ['ban_ip', 'unban_ip']
+
+    def ban_ip(self, request, queryset):
+        queryset.update(stats=True)
+
+    ban_ip.short_description = '封禁IP'
+    ban_ip.allowed_permissions = ('ban',)
+
+    def unban_ip(self, request, queryset):
+        queryset.update(stats=False)
+
+    unban_ip.short_description = '解封IP'
+    unban_ip.allowed_permissions = ('ban',)
+
+    def has_ban_permission(self, request):
+        opts = self.opts
+        return request.user.has_perm('%s.%s' % (opts.app_label, 'ip_kill'))
+
+    def ip_stats(self, obj):
+        return not obj.stats
+
+    ip_stats.short_description = 'IP状态'
+
