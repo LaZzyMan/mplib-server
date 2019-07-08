@@ -88,7 +88,7 @@ DATABASES = {
         'USER': 'lazzy',
         'PASSWORD': 'mp20190529',
         'PORT': 5432,
-        'HOST': '218.197.145.57'
+        'HOST': 'localhost'
     }
 }
 
@@ -143,7 +143,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 }
 
-SIMPLEUI_INDEX = 'http://system.lib.whu.edu.cn/mp/silk/'
+SIMPLEUI_INDEX = 'http://system.lib.whu.edu.cn/mp/silk'
 SIMPLEUI_LOGO = 'http://system.lib.whu.edu.cn/mp-static/logo.png'
 SIMPLEUI_HOME_INFO = False
 
