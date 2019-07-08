@@ -143,7 +143,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 }
 
-SIMPLEUI_INDEX = 'http://www.lib.whu.edu.cn/web/default.asp'
+SIMPLEUI_INDEX = 'http://system.lib.whu.edu.cn/mp/silk/'
 SIMPLEUI_LOGO = 'http://system.lib.whu.edu.cn/mp-static/logo.png'
 SIMPLEUI_HOME_INFO = False
 
