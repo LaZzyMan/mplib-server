@@ -211,9 +211,9 @@ class IPKillerAdmin(admin.ModelAdmin):
     view_on_site = False
     list_display = ('ip', 'time', 'visit', 'ip_stats')
     # ordering = ('-publishTime')
-    list_filter = ('stats', 'solveUser')
-    search_fields = ('contents', )
-    date_hierarchy = 'publishTime'
+    list_filter = ('stats',)
+    search_fields = ('ip', )
+    date_hierarchy = 'time'
     fields = ('ip', 'time', 'visit', 'stats')
     readonly_fields = ('ip', 'time', 'visit', 'stats')
 
