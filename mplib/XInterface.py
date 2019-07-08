@@ -542,13 +542,13 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
-    bor_info = xi.bor_info(uid='00011771')
+    auth = xi.bor_auth_valid(uid='HT004192', verification='205563')
+    xi.x_bor_info(bor_id='HT004192')
+    bor_info = xi.bor_info(uid='2016302590080')
     xi.bor_visit_info(bor_id='00031971')
     xi.loan_history_detail(bor_id='00031971')
     xi.present(set_number='013978', set_entry=1)
-    xi.x_bor_info(bor_id='201530259008')
     xi.bor_rank()
-    auth = xi.bor_auth_valid(uid='2015302590078', verification='16797X')
     set_info = xi.find(request='东野圭吾', code='wu')
     present_info = xi.present(set_number='076131', set_entry=1, lang='cn')
     xi.circ_status(sys_no='001350497')

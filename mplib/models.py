@@ -107,5 +107,16 @@ class Advise(models.Model):
         return str(self.id)
 
 
+class IPKiller(models.Model):
+    ip = models.CharField(verbose_name='IP地址', max_length=100, null=True)
+    time = models.DateTimeField(verbose_name='上次访问时间', null=True)
+    visit = models.IntegerField(verbose_name='访问频率', null=True)
+    stats = models.BooleanField(verbose_name='封禁状态', null=True, default=False)
+
+    class Meta:
+        verbose_name = 'IP封禁'
+        verbose_name_plural = 'IP封禁'
+        permissions = (('ip_kill', 'Can kill IP address'),)
+
 
 

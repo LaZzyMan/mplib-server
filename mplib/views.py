@@ -106,8 +106,8 @@ class LibUserViewSet(viewsets.ReadOnlyModelViewSet):
                                 name=result['reader-name'],
                                 department=result['reader-department'],
                                 readerType=result['reader-type'],
-                                registrationDate=datetime.strptime(result['z305_registration_date'], '%Y%m%d'),
-                                expiryDate=datetime.strptime(result['z305_expiry_date'], '%Y%m%d'))
+                                registrationDate=datetime.strptime(result['z305_registration_date'], '%Y%m%d') if not result['z305_registration_date'] == '00000000' else None,
+                                expiryDate=datetime.strptime(result['z305_expiry_date'], '%Y%m%d') if not result['z305_expiry_date'] == '00000000' else None)
             lu.save()
             session = check_session(user.session)
             return Response({'status': 0, 'user': {'name': lu.name, 'bor_id': lu.libId, 'department': lu.department,
