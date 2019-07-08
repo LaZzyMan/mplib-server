@@ -220,13 +220,13 @@ class IPKillerAdmin(admin.ModelAdmin):
     actions = ['ban_ip', 'unban_ip']
 
     def ban_ip(self, request, queryset):
-        queryset.update(stats=True)
+        queryset.update(stats=False)
 
     ban_ip.short_description = '封禁IP'
     ban_ip.allowed_permissions = ('ban',)
 
     def unban_ip(self, request, queryset):
-        queryset.update(stats=False)
+        queryset.update(stats=True)
 
     unban_ip.short_description = '解封IP'
     unban_ip.allowed_permissions = ('ban',)
