@@ -25,6 +25,7 @@ class InterceptMiddleware(MiddlewareMixin):
         if "py" in http_user_agent or "ssl" in http_user_agent:
             return JSONResponse({'status': -1, 'err_msg': 'SERVICE_ERROR'}, status=403)
         user_ip = request.META['REMOTE_ADDR']
+        print(user_ip)
         try:
             record = IPKiller.objects.get(ip=user_ip)
             if not record.stats:

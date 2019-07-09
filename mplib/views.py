@@ -425,4 +425,4 @@ class AdviseViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AdviseSerializer
 
 
-schema_view = get_swagger_view(title='Lib Mini Program API', url=None)
+schema_view = get_swagger_view(title='WHU LIB Mini Program API', url=None)
