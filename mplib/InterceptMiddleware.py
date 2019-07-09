@@ -24,8 +24,12 @@ class InterceptMiddleware(MiddlewareMixin):
         http_user_agent = str(http_user_agent).lower()
         if "py" in http_user_agent or "ssl" in http_user_agent:
             return JSONResponse({'status': -1, 'err_msg': 'SERVICE_ERROR'}, status=403)
-        user_ip = request.META['REMOTE_ADDR']
-        print(user_ip)
+        if 'HTTP_X_FORWARDED_FOR' in request.META:
+            user_ip = request.META['HTTP_X_FORWARDED_FOR']
+        else:
+            user_ip = request.META['REMOTE_ADDR']
+        if user_ip == '202.114.65.12':
+            return None
         try:
             record = IPKiller.objects.get(ip=user_ip)
             if not record.stats:
@@ -43,7 +47,7 @@ class InterceptMiddleware(MiddlewareMixin):
                 record.visit = record.visit + 1
                 record.save()
             else:
-                record.visits = 1
+                record.visit = 1
                 record.time = timezone.now()
                 record.save()
         return None
