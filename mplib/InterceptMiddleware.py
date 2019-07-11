@@ -24,8 +24,10 @@ class InterceptMiddleware(MiddlewareMixin):
         http_user_agent = str(http_user_agent).lower()
         if 'py' in http_user_agent or 'ssl' in http_user_agent:
             return JSONResponse({'status': -1, 'err_msg': 'SERVICE_ERROR'}, status=403)
-        if 'REFERER' in request.META:
-            return JSONResponse({'status': -1, 'err_msg': request.META['REFERER']}, status=403)
+        if 'micromessenger' not in http_user_agent:
+            return JSONResponse({'status': -1, 'err_msg': 'SERVICE_ERROR'}, status=403)
+        else:
+            return JSONResponse({'status': 0, 'err_msg': 'SERVICE_ERROR'}, status=403)
         if 'HTTP_X_FORWARDED_FOR' in request.META:
             user_ip = request.META['HTTP_X_FORWARDED_FOR']
         else:
