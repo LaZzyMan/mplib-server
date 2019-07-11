@@ -22,8 +22,10 @@ class InterceptMiddleware(MiddlewareMixin):
             return None
         http_user_agent = request.META.get('HTTP_USER_AGENT')
         http_user_agent = str(http_user_agent).lower()
-        if "py" in http_user_agent or "ssl" in http_user_agent:
+        if 'py' in http_user_agent or 'ssl' in http_user_agent:
             return JSONResponse({'status': -1, 'err_msg': 'SERVICE_ERROR'}, status=403)
+        if 'REFERER' in request.META:
+            return JSONResponse({'status': -1, 'err_msg': request.META['REFERER']}, status=403)
         if 'HTTP_X_FORWARDED_FOR' in request.META:
             user_ip = request.META['HTTP_X_FORWARDED_FOR']
         else:
@@ -36,7 +38,7 @@ class InterceptMiddleware(MiddlewareMixin):
                 return JSONResponse({'status': -1, 'err_msg': 'SERVICE_ERROR'}, status=403)
         except IPKiller.DoesNotExist:
             IPKiller.objects.create(ip=user_ip, visit=1, time=timezone.now())
-            return
+            return None
         passed_seconds = (timezone.now() - record.time).seconds
         if record.visit > MAX_VISIT and passed_seconds < TIME_INTERVAL:
             record.stats = False
