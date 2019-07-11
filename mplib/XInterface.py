@@ -149,7 +149,7 @@ class XInterface(object):
             'loan': loan_list,
             'hold': hold_list,
             'fine': {
-                'balance': et.find('balance').text,
+                'balance': 0.00 if et.find('balance') is None else et.find('balance').text,
                 'detail': fine_list
             },
             'bor-info': bor_info
@@ -542,9 +542,9 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
+    bor_info = xi.bor_info(uid='2016302590080')
     auth = xi.bor_auth_valid(uid='HT004192', verification='205563')
     xi.x_bor_info(bor_id='HT004192')
-    bor_info = xi.bor_info(uid='2016302590080')
     xi.bor_visit_info(bor_id='00031971')
     xi.loan_history_detail(bor_id='00031971')
     xi.present(set_number='013978', set_entry=1)
