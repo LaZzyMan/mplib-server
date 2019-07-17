@@ -120,19 +120,31 @@ class XInterface(object):
         fines = et.findall('fine')
         # fines = et.findall('fine')
         holds = et.findall('item-h')
+        for hold in holds:
+            try:
+                hold_book = {'hold_info': self.z37_to_dict(hold.find('z37')),
+                             'book_info': self.z13_to_dict(hold.find('z13')),
+                             'bar_code': hold.find('./z30/z30-barcode').text}
+                hold_list.append(hold_book)
+            except AttributeError as _:
+                continue
+        for loan in loans:
+            try:
+                loan_book = {'loan_info': self.z36_to_dict(loan.find('z36')),
+                              'book_info': self.z13_to_dict(loan.find('z13')),
+                              'bar_code': loan.find('./z30/z30-barcode').text}
+                loan_list.append(loan_book)
+            except AttributeError as _:
+                continue
+        for fine in fines:
+            try:
+                fine_book = {'fine_info': self.z31_to_dict(fine.find('z31')),
+                              'book_info': self.z13_to_dict(fine.find('z13')),
+                              'bar_code': fine.find('./z30/z30-barcode').text}
+                fine_list.append(fine_book)
+            except AttributeError as _:
+                continue
         try:
-            for hold in holds:
-                hold_list.append({'hold_info': self.z37_to_dict(hold.find('z37')),
-                                  'book_info': self.z13_to_dict(hold.find('z13')),
-                                  'bar_code': hold.find('./z30/z30-barcode').text})
-            for loan in loans:
-                loan_list.append({'loan_info': self.z36_to_dict(loan.find('z36')),
-                                  'book_info': self.z13_to_dict(loan.find('z13')),
-                                  'bar_code': loan.find('./z30/z30-barcode').text})
-            for fine in fines:
-                fine_list.append({'fine_info': self.z31_to_dict(fine.find('z31')),
-                                  'book_info': self.z13_to_dict(fine.find('z13')),
-                                  'bar_code': fine.find('./z30/z30-barcode').text})
             bor_info = {
                 'name': et.find('./z303/z303-name').text,
                 'birthday': et.find('./z303/z303-birth-date').text,
@@ -542,11 +554,11 @@ class XInterface(object):
 
 if __name__ == '__main__':
     xi = XInterface(username='miniapp', password='wdlq@2019', alpha_psw='xzw2019')
-    bor_info = xi.bor_info(uid='2016302590080')
+    bor_info = xi.bor_info(uid='00011776')
+    xi.x_bor_info(bor_id='00011776')
+    xi.loan_history_detail(bor_id='2015302590005')
     auth = xi.bor_auth_valid(uid='HT004192', verification='205563')
-    xi.x_bor_info(bor_id='HT004192')
     xi.bor_visit_info(bor_id='00031971')
-    xi.loan_history_detail(bor_id='00031971')
     xi.present(set_number='013978', set_entry=1)
     xi.bor_rank()
     set_info = xi.find(request='东野圭吾', code='wu')
