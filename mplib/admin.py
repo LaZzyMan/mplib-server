@@ -1,5 +1,5 @@
 from django.contrib import admin
-from mplib.models import Notice, LibUser, User, Activity, Advise, IPKiller
+from mplib.models import Notice, LibUser, User, Activity, Advise, IPKiller, Training
 import uuid
 from django.contrib import messages
 from django.contrib.auth.models import User as AdminUser
@@ -7,6 +7,7 @@ from mplib import models
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
+from django.utils import timezone
 
 
 admin.site.site_header = '图书馆小程序后台管理系统'
@@ -28,6 +29,23 @@ class NoticeForm(forms.ModelForm):
         else:
             if self.cleaned_data['contents'] is None:
                 raise ValidationError('请填写公告内容')
+        super().clean()
+
+
+class TrainingForm(forms.ModelForm):
+    class Meta:
+        model = models.Training
+        fields = ['title', 'type', 'time', 'place', 'contents']
+
+    def clean(self):
+        if self.cleaned_data['title'] is None:
+            raise ValidationError('请填写培训主题')
+        if self.cleaned_data['contents'] is None:
+            raise ValidationError('请填写培训简介')
+        if self.cleaned_data['time'] is None:
+            raise ValidationError('请填写培训时间')
+        if self.cleaned_data['place'] is None:
+            raise ValidationError('请填写培训地点')
         super().clean()
 
 
@@ -235,3 +253,40 @@ class IPKillerAdmin(admin.ModelAdmin):
         opts = self.opts
         return request.user.has_perm('%s.%s' % (opts.app_label, 'ip_kill'))
 
+
+@admin.register(Training)
+class TrainingAdmin(admin.ModelAdmin):
+    form = TrainingForm
+    list_per_page = 50
+    # save_on_top = True
+    view_on_site = False
+    list_display = ('title', 'type', 'time', 'place', 'publishTime', 'pubUser', 'stats')
+    # ordering = ('-publishTime')
+    list_filter = ('type', 'stats', 'pubUser')
+    search_fields = ('title', 'contents')
+    date_hierarchy = 'publishTime'
+    fields = ('title', 'type', 'time', 'place', 'contents')
+    actions = ['publish_training', 'unpublish_training']
+
+    def publish_training(self, request, queryset):
+        queryset.update(stats=True)
+        queryset.update(publishTime=timezone.now())
+
+    publish_training.short_description = '发布培训'
+    publish_training.allowed_permissions = ('publish', )
+
+    def unpublish_training(self, request, queryset):
+        queryset.update(stats=False)
+
+    publish_training.short_description = '撤下培训'
+    publish_training.allowed_permissions = ('publish', )
+
+    def has_publish_permission(self, request):
+        opts = self.opts
+        return request.user.has_perm('%s.%s' % (opts.app_label, 'publish_training'))
+
+    def save_model(self, request, obj, form, change):
+        obj.pubUser = AdminUser.objects.get(username=request.user)
+        obj.publishTime = timezone.now()
+        obj.stats = False
+        super(TrainingAdmin, self).save_model(request, obj, form, change)

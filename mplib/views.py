@@ -425,4 +425,10 @@ class AdviseViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AdviseSerializer
 
 
+class TrainingViewSet(viewsets.ModelViewSet):
+    queryset = models.Training.objects.filter(stats=True).order_by('-time')
+    serializer_class = serializers.TrainingSerializer
+    filter_backends = (TypeFilter,)
+
+
 schema_view = get_swagger_view(title='WHU LIB Mini Program API', url=None)

@@ -19,6 +19,17 @@ class NoticeSerializer(serializers.ModelSerializer):
         return obj.pubUser.username
 
 
+class TrainingSerializer(serializers.ModelSerializer):
+    pub_user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Notice
+        fields = ('title', 'contents', 'type', 'place', 'time', 'pub_user')
+
+    def get_pub_user(self, obj):
+        return obj.pubUser.username
+
+
 class ActivitySerializer(serializers.ModelSerializer):
     pub_user = serializers.SerializerMethodField()
     img_url = serializers.SerializerMethodField()

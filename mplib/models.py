@@ -119,4 +119,22 @@ class IPKiller(models.Model):
         permissions = (('ip_kill', 'Can kill IP address'),)
 
 
+class Training(models.Model):
+    title = models.CharField(verbose_name='主题', max_length=200, null=False, blank=False)
+    type = models.CharField(verbose_name='类别', max_length=10, choices=(('B', '毕业指导'), ('X', '学习助手'), ('S', '实用软件')), default='B')
+    time = models.DateTimeField(verbose_name='时间', null=False)
+    publishTime = models.DateTimeField(verbose_name='发布时间', null=False)
+    pubUser = models.ForeignKey(AdminUser, verbose_name='发布者', on_delete=models.SET_NULL, blank=True, null=True,
+                                db_index=True, related_name='training_pub_user')
+    contents = models.TextField(verbose_name='简介', null=True, blank=True)
+    place = models.CharField(verbose_name='地点', max_length=50)
+    stats = models.BooleanField(verbose_name='发布状态')
+
+    class Meta:
+        verbose_name = '培训管理'
+        verbose_name_plural = '培训管理'
+        permissions = (('publish_training', 'Can publish trainings'),)
+
+    def __str__(self):
+        return self.title
 
