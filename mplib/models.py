@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User as AdminUser
+from django.contrib.postgres.fields import JSONField
 
 # Create your models here.
 
@@ -137,4 +138,18 @@ class Training(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Reminder(models.Model):
+    openId = models.CharField(verbose_name='open id', max_length=100, null=True)
+    templateId = models.CharField(verbose_name='template id', max_length=100, null=True)
+    page = models.CharField(verbose_name='page', max_length=100, null=True)
+    formId = models.CharField(verbose_name='form id', max_length=100, null=True)
+    emphasisKeyword = models.CharField(verbose_name='emphasis keyword', max_length=100, null=True)
+    data = JSONField(verbose_name='data')
+    time = models.DateTimeField(verbose_name='remind time', null=True)
+
+    class Meta:
+        verbose_name = '推送提示'
+        verbose_name_plural = '推送提示'
 

@@ -32,6 +32,16 @@ class WxAuthException(Exception):
             self.error_msg = 'INVALID_CODE'
         elif err_code == -1:
             self.error_msg = 'SYSTEM_BUSY'
+        elif err_code == 40037:
+            self.error_msg = 'TEMPLATE_ID_ERROR'
+        elif err_code == 41028:
+            self.error_msg = 'FORM_ID_ERROR'
+        elif err_code == 41029:
+            self.error_msg = 'FORM_ID_USED'
+        elif err_code == 41030:
+            self.error_msg = 'PAGE_ERROR'
+        elif err_code == 45009:
+            self.error_msg = 'OVERRUN_LIMIT'
         else:
             self.error_msg = 'UNKNOWN_ERROR'
         super().__init__(self, self.error_msg)
@@ -56,15 +66,21 @@ def trouble_shooter(func):
         try:
             return func(*args, **kwargs)
         except exceptions.ObjectDoesNotExist as _:
+            print('ObjectDoesNotExist. Detail: LOGIN_FAILED')
             return Response({'status': 1, 'err_msg': 'LOGIN_FAILED'})
         except WxAuthException as e:
+            print('WxAuthException. Detail: %s' % e.error_msg)
             return Response({'status': 2, 'err_msg': e.error_msg})
         except RequestException as _:
+            print('RequestException. Detail: SERVER_NETWORK_ERROR')
             return Response({'status': 3, 'err_msg': 'SERVER_NETWORK_ERROR'})
         except ParamMissException as e:
+            print('ParamMissException. Detail: %s' % e.error_msg)
             return Response({'status': 4, 'err_msg': e.error_msg})
         except RSAException as _:
+            print('RSAException. Detail: RSA_KEY_ERROR')
             return Response({'status': 5, 'err_msg': 'RSA_KEY_ERROR'})
         except LibException as e:
+            print('LibException. Detail: %s' % e.error_detail)
             return Response({'status': 6, 'err_msg': e.error_msg, 'detail': e.error_detail})
     return wrapper
