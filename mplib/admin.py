@@ -278,8 +278,8 @@ class TrainingAdmin(admin.ModelAdmin):
     def unpublish_training(self, request, queryset):
         queryset.update(stats=False)
 
-    publish_training.short_description = '撤下培训'
-    publish_training.allowed_permissions = ('publish', )
+    unpublish_training.short_description = '撤下培训'
+    unpublish_training.allowed_permissions = ('publish', )
 
     def has_publish_permission(self, request):
         opts = self.opts
