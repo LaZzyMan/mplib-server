@@ -24,7 +24,7 @@ class TrainingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notice
-        fields = ('title', 'contents', 'type', 'place', 'time', 'pub_user')
+        fields = ('id', 'title', 'contents', 'type', 'place', 'start_time', 'end_time', 'speaker', 'pub_user')
 
     def get_pub_user(self, obj):
         return obj.pubUser.username

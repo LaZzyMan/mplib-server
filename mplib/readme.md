@@ -347,6 +347,21 @@ libuser/hold_req_cancel
 - previous
 - results
 
+### 培训查询
+
+/training
+
+#### 参数
+
+- type: B(毕业指导), X(学习助手), S(实用软件)
+
+#### 返回
+
+- count
+- next
+- previous
+- results
+
 ### 活动查询
 
 /activity
@@ -388,6 +403,47 @@ libuser/hold_req_cancel
 - tel
 - contents
 - ...
+
+## 消息推送
+
+### 培训信息
+发送前请在前端判断时间是否在7天之内，只接受7天内的推送请求
+#### 参数
+- session
+- formId：用户提交时的表单id
+- page：消息需要跳转的页面
+- trainId：培训的id
+- remindText：提醒的文本（备注）
+
+#### 返回
+- status
+- session
+
+### 书籍到期提醒
+发送前请在前端判断时间是否在7天之内，只接受7天内的推送请求
+#### 参数
+- session
+- formId：用户提交时的表单id
+- page：消息需要跳转的页面
+- bookName：书名
+- borrowTime：借阅时间 %Y-%m-%d
+- expiredTime：到期时间 %Y-%m-%d
+
+#### 返回
+- status
+- session
+
+## 新生游戏session检测
+
+### 参数（get）
+- session
+
+### 返回
+- status
+- libBind：用户是否绑定图书馆账号
+- info：若绑定则返回账户信息，否则为空
+    - libId：用户的图书馆账号
+    - openId：用户的openid
 
 ## 报错信息
 

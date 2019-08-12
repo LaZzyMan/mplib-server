@@ -123,7 +123,9 @@ class IPKiller(models.Model):
 class Training(models.Model):
     title = models.CharField(verbose_name='主题', max_length=200, null=False, blank=False)
     type = models.CharField(verbose_name='类别', max_length=10, choices=(('B', '毕业指导'), ('X', '学习助手'), ('S', '实用软件')), default='B')
-    time = models.DateTimeField(verbose_name='时间', null=False)
+    start_time = models.DateTimeField(verbose_name='开始时间', null=False)
+    end_time = models.DateTimeField(verbose_name='结束时间', null=False)
+    speaker = models.CharField(verbose_name='主讲人', max_length=50)
     publishTime = models.DateTimeField(verbose_name='发布时间', null=False)
     pubUser = models.ForeignKey(AdminUser, verbose_name='发布者', on_delete=models.SET_NULL, blank=True, null=True,
                                 db_index=True, related_name='training_pub_user')

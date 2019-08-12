@@ -20,18 +20,20 @@ class InterceptMiddleware(MiddlewareMixin):
     def process_request(self, request):
         if not re.match('^/mp/api', request.path):
             return None
-        http_user_agent = request.META.get('HTTP_USER_AGENT')
-        http_user_agent = str(http_user_agent).lower()
-        if 'py' in http_user_agent or 'ssl' in http_user_agent:
-            return JSONResponse({'status': -1, 'err_msg': 'SERVICE_ERROR'}, status=403)
-        if 'micromessenger' not in http_user_agent:
-            return JSONResponse({'status': -1, 'err_msg': 'SERVICE_ERROR'}, status=403)
         if 'HTTP_X_FORWARDED_FOR' in request.META:
             user_ip = request.META['HTTP_X_FORWARDED_FOR']
         else:
             user_ip = request.META['REMOTE_ADDR']
         if user_ip == '202.114.65.12':
             return None
+        if user_ip == '202.114.65.168' and re.match('^/mp/api/game', request.path):
+            return None
+        http_user_agent = request.META.get('HTTP_USER_AGENT')
+        http_user_agent = str(http_user_agent).lower()
+        if 'py' in http_user_agent or 'ssl' in http_user_agent:
+            return JSONResponse({'status': -1, 'err_msg': 'SERVICE_ERROR'}, status=403)
+        if 'micromessenger' not in http_user_agent:
+            return JSONResponse({'status': -1, 'err_msg': 'SERVICE_ERROR'}, status=403)
         try:
             record = IPKiller.objects.get(ip=user_ip)
             if not record.stats:

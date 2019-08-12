@@ -42,10 +42,14 @@ class TrainingForm(forms.ModelForm):
             raise ValidationError('请填写培训主题')
         if self.cleaned_data['contents'] is None:
             raise ValidationError('请填写培训简介')
-        if self.cleaned_data['time'] is None:
-            raise ValidationError('请填写培训时间')
+        if self.cleaned_data['start_time'] is None:
+            raise ValidationError('请填写培训开始时间')
+        if self.cleaned_data['end_time'] is None:
+            raise ValidationError('请填写培训结束时间')
         if self.cleaned_data['place'] is None:
             raise ValidationError('请填写培训地点')
+        if self.cleaned_data['speaker'] is None:
+            raise ValidationError('请填写主讲人')
         super().clean()
 
 
@@ -260,12 +264,12 @@ class TrainingAdmin(admin.ModelAdmin):
     list_per_page = 50
     # save_on_top = True
     view_on_site = False
-    list_display = ('title', 'type', 'time', 'place', 'publishTime', 'pubUser', 'stats')
+    list_display = ('title', 'type', 'start_time', 'place', 'speaker', 'publishTime', 'pubUser', 'stats')
     # ordering = ('-publishTime')
-    list_filter = ('type', 'stats', 'pubUser')
+    list_filter = ('type', 'stats', 'pubUser', 'speaker')
     search_fields = ('title', 'contents')
-    date_hierarchy = 'publishTime'
-    fields = ('title', 'type', 'time', 'place', 'contents')
+    date_hierarchy = 'start_time'
+    fields = ('title', 'type', 'start_time', 'end_time', 'speaker', 'place', 'contents')
     actions = ['publish_training', 'unpublish_training']
 
     def publish_training(self, request, queryset):

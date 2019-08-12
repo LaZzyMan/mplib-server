@@ -1,4 +1,5 @@
 from mplib.XInterface import XInterface
+from mplib.RemindController import RemindController
 from rest_framework import filters, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
@@ -284,6 +285,7 @@ class LibUserViewSet(viewsets.ReadOnlyModelViewSet):
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.User.objects.all()
+    rc = RemindController()
     serializer_class = serializers.UserSerializer
     filter_backends = (SessionFilter,)
 
@@ -403,6 +405,74 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         user.save()
         session = check_session(user.session)
         return Response({'status': 0, 'session': session})
+
+    @action(methods=['get'], detail=False)
+    @trouble_shooter
+    def add_training_reminder(self, request):
+        check_param(['session', 'formId', 'page', 'trainId', 'remindText'], request)
+        session = request.query_params.get('session')
+        form_id = request.query_params.get('formId')
+        page = request.query_params.get('page')
+        train_id = request.query_params.get('trainId')
+        remind_text = request.query_params.get('remindText')
+        train = models.Training.objects.get(id=train_id)
+        user = models.User.objects.get(session=session)
+        template_id = '1Q4NwD3eywNEz8ktIxEZRBRiQ7c5NGIrMkuCRPuZ6_0'
+        reminder = models.Reminder(openId=user.openId,
+                                   templateId=template_id,
+                                   page=page,
+                                   formId=form_id,
+                                   time=train.start_time,
+                                   data={
+                                       'keyword1': {'value': train.title},
+                                       'keyword4': {'value': train.speaker},
+                                       'keyword3': {'value': train.place},
+                                       'keyword2': {'value': (train.start_time - timezone.datetime.timedelta(hours=2)).strftime('%Y年%m月%d日 %H:%M')},
+                                       'keyword5': {'value': remind_text}
+                                   })
+        reminder.save()
+        session = check_session(user.session)
+        return Response({'status': 0, 'session': session})
+
+    @action(methods=['get'], detail=False)
+    @trouble_shooter
+    def add_book_reminder(self, request):
+        template_id = 'IUQETX94LNFQ29heCx3MnCHOTsYY8BmzzCsZttjRRis'
+        check_param(['session', 'formId', 'page', 'bookName', 'borrowTime', 'expiredTime'], request)
+        session = request.query_params.get('session')
+        form_id = request.query_params.get('formId')
+        page = request.query_params.get('page')
+        book_name = request.query_params.get('bookName')
+        borrow_time = request.query_params.get('borrowTime')
+        expired_time = request.query_params.get('expiredTime')
+        user = models.User.objects.get(session=session)
+        reminder = models.Reminder(openId=user.openId,
+                                   templateId=template_id,
+                                   page=page,
+                                   formId=form_id,
+                                   time=timezone.datetime.strptime(expired_time, '%Y-%m-%d') - timezone.datetime.timedelta(days=1),
+                                   data={
+                                       'keyword1': {'value': book_name},
+                                       'keyword4': {'value': '1天'},
+                                       'keyword3': {'value': expired_time},
+                                       'keyword2': {'value': borrow_time},
+                                       'keyword5': {'value': '请尽快到馆还书'}
+                                   })
+        reminder.save()
+        session = check_session(user.session)
+        return Response({'status': 0, 'session': session})
+
+    @action(methods=['get'], detail=False)
+    @trouble_shooter
+    def game_check_user(self, request):
+        check_param(['session'], request)
+        session = request.query_params.get('session')
+        user = models.User.objects.get(session=session)
+        if user.libAccount is None:
+            return Response({'status': 0, 'libBind': False,
+                             'info': {'libId': user.libAccount.libId, 'openId': user.openId}})
+        else:
+            return Response({'status': 0, 'libBind': True, 'info': None})
 
 
 class NoticeViewSet(viewsets.ReadOnlyModelViewSet):
