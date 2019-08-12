@@ -56,7 +56,7 @@ class RemindController(object):
             # raise WxAuthException(err_code=result['errcode'])
 
     def check_reminder(self):
-        query = Reminder.objects.filter(time__gte=timezone.now())
+        query = Reminder.objects.filter(time__lte=timezone.now())
         num = 0
         success = 0
         for reminder in query:

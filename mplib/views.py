@@ -46,6 +46,15 @@ class SessionFilter(filters.BaseFilterBackend):
         else:
             return queryset
 
+class TrainingSessionFilter(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        session = request.query_params.get('session', None)
+        if session is not None:
+            user = models.User.objects.get(session=session)
+            return user.training_set.all()
+        else:
+            return queryset
+
 # Create your views here.
 
 
@@ -408,34 +417,6 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(methods=['get'], detail=False)
     @trouble_shooter
-    def add_training_reminder(self, request):
-        check_param(['session', 'formId', 'page', 'trainId', 'remindText'], request)
-        session = request.query_params.get('session')
-        form_id = request.query_params.get('formId')
-        page = request.query_params.get('page')
-        train_id = request.query_params.get('trainId')
-        remind_text = request.query_params.get('remindText')
-        train = models.Training.objects.get(id=train_id)
-        user = models.User.objects.get(session=session)
-        template_id = '1Q4NwD3eywNEz8ktIxEZRBRiQ7c5NGIrMkuCRPuZ6_0'
-        reminder = models.Reminder(openId=user.openId,
-                                   templateId=template_id,
-                                   page=page,
-                                   formId=form_id,
-                                   time=train.start_time,
-                                   data={
-                                       'keyword1': {'value': train.title},
-                                       'keyword4': {'value': train.speaker},
-                                       'keyword3': {'value': train.place},
-                                       'keyword2': {'value': (train.start_time - timezone.datetime.timedelta(hours=2)).strftime('%Y年%m月%d日 %H:%M')},
-                                       'keyword5': {'value': remind_text}
-                                   })
-        reminder.save()
-        session = check_session(user.session)
-        return Response({'status': 0, 'session': session})
-
-    @action(methods=['get'], detail=False)
-    @trouble_shooter
     def add_book_reminder(self, request):
         template_id = 'IUQETX94LNFQ29heCx3MnCHOTsYY8BmzzCsZttjRRis'
         check_param(['session', 'formId', 'page', 'bookName', 'borrowTime', 'expiredTime'], request)
@@ -498,7 +479,50 @@ class AdviseViewSet(viewsets.ModelViewSet):
 class TrainingViewSet(viewsets.ModelViewSet):
     queryset = models.Training.objects.filter(stats=True).order_by('-time')
     serializer_class = serializers.TrainingSerializer
-    filter_backends = (TypeFilter,)
+    filter_backends = (TypeFilter, TrainingSessionFilter, )
+
+    @action(methods=['get'], detail=False)
+    @trouble_shooter
+    def add_training_reminder(self, request):
+        check_param(['session', 'formId', 'page', 'trainId', 'remindText'], request)
+        session = request.query_params.get('session')
+        form_id = request.query_params.get('formId')
+        page = request.query_params.get('page')
+        train_id = request.query_params.get('trainId')
+        remind_text = request.query_params.get('remindText')
+        train = models.Training.objects.get(id=train_id)
+        user = models.User.objects.get(session=session)
+        template_id = '1Q4NwD3eywNEz8ktIxEZRBRiQ7c5NGIrMkuCRPuZ6_0'
+        reminder = models.Reminder(openId=user.openId,
+                                   templateId=template_id,
+                                   page=page,
+                                   formId=form_id,
+                                   time=train.start_time,
+                                   data={
+                                       'keyword1': {'value': train.title},
+                                       'keyword4': {'value': train.speaker},
+                                       'keyword3': {'value': train.place},
+                                       'keyword2': {
+                                           'value': (train.start_time - timezone.datetime.timedelta(hours=2)).strftime(
+                                               '%Y年%m月%d日 %H:%M')},
+                                       'keyword5': {'value': remind_text}
+                                   })
+        reminder.save()
+        models.UserTraining.objects.create(user=user, training=train, reminder=reminder)
+        session = check_session(user.session)
+        return Response({'status': 0, 'session': session})
+
+    @action(methods=['get'], detail=False)
+    @trouble_shooter
+    def cancel_training_reminder(self, request):
+        check_param(['session', 'trainId'], request)
+        session = request.query_params.get('session')
+        train_id = request.query_params.get('trainId')
+        train = models.Training.objects.get(id=train_id)
+        user = models.User.objects.get(session=session)
+        models.UserTraining.objects.filter(user=user).filter(training=train).delete()
+        session = check_session(user.session)
+        return Response({'status': 0, 'session': session})
 
 
 schema_view = get_swagger_view(title='WHU LIB Mini Program API', url=None)

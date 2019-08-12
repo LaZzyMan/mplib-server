@@ -354,6 +354,7 @@ libuser/hold_req_cancel
 #### 参数
 
 - type: B(毕业指导), X(学习助手), S(实用软件)
+-session: 用于查询用户预约的活动
 
 #### 返回
 
@@ -407,6 +408,8 @@ libuser/hold_req_cancel
 ## 消息推送
 
 ### 培训信息
+training/add_training_reminder
+
 发送前请在前端判断时间是否在7天之内，只接受7天内的推送请求
 #### 参数
 - session
@@ -419,7 +422,19 @@ libuser/hold_req_cancel
 - status
 - session
 
+### 取消培训预约
+training/cancel_training_reminder
+#### 参数
+- session
+- trainId：培训的id
+
+#### 返回
+- status
+- session
+
 ### 书籍到期提醒
+user/add_book_reminder
+
 发送前请在前端判断时间是否在7天之内，只接受7天内的推送请求
 #### 参数
 - session
@@ -434,7 +449,7 @@ libuser/hold_req_cancel
 - session
 
 ## 新生游戏session检测
-
+user/game_check_session
 ### 参数（get）
 - session
 

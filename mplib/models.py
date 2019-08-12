@@ -132,6 +132,7 @@ class Training(models.Model):
     contents = models.TextField(verbose_name='简介', null=True, blank=True)
     place = models.CharField(verbose_name='地点', max_length=50)
     stats = models.BooleanField(verbose_name='发布状态')
+    users = models.ManyToManyField(User, through='UserTraining')
 
     class Meta:
         verbose_name = '培训管理'
@@ -154,4 +155,13 @@ class Reminder(models.Model):
     class Meta:
         verbose_name = '推送提示'
         verbose_name_plural = '推送提示'
+
+
+class UserTraining(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    training = models.ForeignKey(Training, on_delete=models.CASCADE)
+    reminder = models.ForeignKey(Reminder, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'user_training_relationship'
 
