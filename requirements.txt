@@ -28,5 +28,5 @@ beautifulsoup4==4.7.1
 rsa==4.0
 django-simpleui==2.1.5
 pycryptodome==3.8.2
-pillow == 6.0.0
+pillow == 9.0.1
 django-silk == 3.0.2
